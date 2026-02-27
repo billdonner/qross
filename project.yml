@@ -25,8 +25,8 @@ targets:
         SUPPORTS_MACCATALYST: false
     entitlements:
       path: Qross/Qross.entitlements
-    dependencies:
-      - target: QrossClip
+    # dependencies:
+    #   - target: QrossClip  # Re-enable when App Clip provisioning is set up
 
   QrossClip:
     type: application.on-demand-install-capable

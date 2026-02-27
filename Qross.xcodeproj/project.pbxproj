@@ -32,7 +32,6 @@
 		99B9C8A938D6D215B7D346CB /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E73F6D3994088CFADEA3A39A /* Topic.swift */; };
 		A02D74D5D82B59F1128A8308 /* QuestionCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */; };
 		A0369AC75A5ABEBE9200F9C1 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EDB4BA3A64DC471AF5AC71 /* GameState.swift */; };
-		A11890699C6B5962D528BB57 /* QrossClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = C724709AFEFC41F9407392EE /* QrossClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AC2DC16490FC8546AB4D7DA6 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E047560292F5DF643743D490 /* Challenge.swift */; };
 		AF548D2A5050F8D0DDC0D5AE /* QuestionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442CA4B722FD1114E6592067 /* QuestionOverlay.swift */; };
 		BBD73AA44CABFE7F0AEBB052 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4760C973A278CC064D914C /* StatsView.swift */; };
@@ -52,28 +51,7 @@
 			remoteGlobalIDString = E42174C9DB79CA9E7700B5FA;
 			remoteInfo = Qross;
 		};
-		5BA17A7A7F93C0574A6C9422 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 360643400DC8BA8696284ED9 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5233C579730B0B5293092CB3;
-			remoteInfo = QrossClip;
-		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		9ECB10FC976930932765F922 /* Embed App Clips */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
-			dstSubfolderSpec = 16;
-			files = (
-				A11890699C6B5962D528BB57 /* QrossClip.app in Embed App Clips */,
-			);
-			name = "Embed App Clips";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1D3298107FE7F0D01A38B0C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -295,12 +273,10 @@
 			buildPhases = (
 				1523E4EB3A8B88F44A89EE28 /* Sources */,
 				EC06BA68508E6B62FFB719C4 /* Resources */,
-				9ECB10FC976930932765F922 /* Embed App Clips */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				6C6FC8F42028D9C8AAF08DAD /* PBXTargetDependency */,
 			);
 			name = Qross;
 			packageProductDependencies = (
@@ -426,11 +402,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		6C6FC8F42028D9C8AAF08DAD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5233C579730B0B5293092CB3 /* QrossClip */;
-			targetProxy = 5BA17A7A7F93C0574A6C9422 /* PBXContainerItemProxy */;
-		};
 		8C1EFF06E2F5725D0EF1AA28 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E42174C9DB79CA9E7700B5FA /* Qross */;
