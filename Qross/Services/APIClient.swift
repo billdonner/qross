@@ -6,7 +6,7 @@ enum APIError: Error {
 
 /// Minimal card-engine API client for fetching trivia questions
 struct QrossAPI {
-    static let baseURL = "https://bd-card-engine.fly.dev"
+    static let baseURL = "https://bd-cardzerver.fly.dev"
 
     /// Fetch trivia categories with question counts
     static func fetchCategories() async throws -> [Topic] {
