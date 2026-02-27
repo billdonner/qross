@@ -27,5 +27,6 @@ playground.xcworkspace
 Pods/
 .build/
 
-# PNG assets
+# PNG assets (except xcassets which need them)
 *.png
+!*/Assets.xcassets/**/*.png

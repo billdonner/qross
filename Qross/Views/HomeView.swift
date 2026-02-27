@@ -7,6 +7,8 @@ struct HomeView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showGame = false
+    @State private var showHowToPlay = false
+    @State private var showAbout = false
 
     var body: some View {
         NavigationStack {
@@ -103,12 +105,28 @@ struct HomeView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .padding(.horizontal)
 
-                    // Game Center
-                    if gcManager.isAuthenticated {
+                    // Bottom links
+                    HStack(spacing: 20) {
+                        if gcManager.isAuthenticated {
+                            Button {
+                                gcManager.showLeaderboard()
+                            } label: {
+                                Label("Leaderboards", systemImage: "trophy")
+                                    .font(.callout)
+                            }
+                        }
+
                         Button {
-                            gcManager.showLeaderboard()
+                            showHowToPlay = true
                         } label: {
-                            Label("Leaderboards", systemImage: "trophy")
+                            Label("How to Play", systemImage: "questionmark.circle")
+                                .font(.callout)
+                        }
+
+                        Button {
+                            showAbout = true
+                        } label: {
+                            Label("About", systemImage: "info.circle")
                                 .font(.callout)
                         }
                     }
@@ -121,6 +139,12 @@ struct HomeView: View {
                     showGame = false
                     game.reset()
                 })
+            }
+            .sheet(isPresented: $showHowToPlay) {
+                HowToPlayView()
+            }
+            .sheet(isPresented: $showAbout) {
+                AboutView()
             }
             .task {
                 gcManager.authenticate()
