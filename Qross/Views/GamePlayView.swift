@@ -18,8 +18,22 @@ struct GamePlayView: View {
             Color(.systemBackground).ignoresSafeArea()
 
             if game.board != nil {
-                // Board always visible once game starts
-                BoardView(game: game, topicColors: topicColors)
+                VStack(spacing: 0) {
+                    // Board always visible once game starts
+                    BoardView(game: game, topicColors: topicColors)
+
+                    // Quit button during play
+                    if !gameOver {
+                        Button {
+                            onExit()
+                        } label: {
+                            Label("Quit Game", systemImage: "xmark.circle")
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.bottom, 8)
+                    }
+                }
 
                 // Result overlay when game ends
                 if gameOver {

@@ -61,6 +61,9 @@ struct AboutView: View {
                         Text("Built by Bill Donner")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                        Text("Inspired by Carol Friedman")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.bottom, 20)
                 }
