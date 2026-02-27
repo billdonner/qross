@@ -62,40 +62,43 @@ The board is a square matrix of cells. Each cell contains one Challenge, colored
 
 ### Board Sizes
 
-| Size | Cells | Min Path | Recommended Topics |
-|------|-------|----------|--------------------|
-| 4×4 | 16 | 4 | 2-4 |
-| 5×5 | 25 | 5 | 3-5 |
-| 6×6 | 36 | 6 | 3-6 |
-| 7×7 | 49 | 7 | 4-7 |
-| 8×8 | 64 | 8 | 5-8 |
-| 9×9 | 81 | 9 | 5-9 |
-| 10×10 | 100 | 10 | 6-10 |
+The UI picker offers sizes 4 through 8:
+
+| Size | Cells | Min Path | Max Wrong | Recommended Topics |
+|------|-------|----------|-----------|--------------------|
+| 4×4 | 16 | 4 | 2 | 2-4 |
+| 5×5 | 25 | 5 | 3 | 3-5 |
+| 6×6 | 36 | 6 | 4 | 3-6 |
+| 7×7 | 49 | 7 | 5 | 4-7 |
+| 8×8 | 64 | 8 | 6 | 5-8 |
 
 Min Path = minimum moves with 8-connectivity (the diagonal).
 
 ## Start and End Positions
 
-### Corner-to-Corner Modes
+### Pick Any Corner (Implemented)
 
-| Mode | Start | End | Description |
-|------|-------|-----|-------------|
-| **Classic** | Top-left (1,1) | Bottom-right (N,N) | Default diagonal |
-| **Reverse** | Top-right (1,N) | Bottom-left (N,1) | Alternate diagonal |
-| **Uphill** | Bottom-left (N,1) | Top-right (1,N) | Climb the grid |
-| **Downhill** | Bottom-right (N,N) | Top-left (1,1) | Reverse classic |
+At game start, all 4 corners are highlighted. The player taps any corner to begin:
+1. That corner's question is presented
+2. A correct answer **locks** it as the start position
+3. The diagonally opposite corner automatically becomes the goal
 
-### Edge-to-Edge Mode
+| Corner Picked | Goal | CornerPair |
+|---------------|------|------------|
+| Top-left (0,0) | Bottom-right (N,N) | Classic ↘ |
+| Top-right (0,N) | Bottom-left (N,0) | Reverse ↙ |
+| Bottom-left (N,0) | Top-right (0,N) | Uphill ↗ |
+| Bottom-right (N,N) | Top-left (0,0) | Downhill ↖ |
 
-Player taps any cell on the top or left edge to start. The end cell is the mirror-opposite on the bottom or right edge:
-- Start on row 1, col 3 → End on row N, col 3
-- Start on row 2, col 1 → End on row 2, col N
+This gives the player strategic choice — scan the board for favorable topics near each corner before committing.
 
-This opens up non-diagonal paths and changes the strategy significantly.
+### Edge-to-Edge Mode (Future)
 
-### Random Corners
+Player taps any cell on the top or left edge to start. The end cell is the mirror-opposite on the bottom or right edge. Not yet implemented.
 
-Game randomly picks two opposite corners. Player doesn't know which until the board appears. Adds surprise.
+### Random Corners (Future)
+
+Game randomly picks two opposite corners. Player doesn't know which until the board appears. Not yet implemented.
 
 ### Daily Challenge
 
@@ -158,13 +161,31 @@ The first and last cells must be answered correctly. Special handling:
 - If lives remain, player can try to reach the end cell from an adjacent completed cell
 - The end cell gets a new question from the same topic
 
+## Hints
+
+The question overlay offers two hint types before the player answers:
+
+### Show Hint (+1 penalty)
+- Available when the challenge has a `hint` field
+- Reveals a text hint below the question
+- Can only be used once per question
+- Adds **1** to `hintPenalty`
+
+### Eliminate (+2 penalty)
+- Removes one wrong answer choice from the visible options
+- Keeps at least 1 wrong choice visible (so there's always a real choice)
+- Can be used multiple times per question (as long as 2+ wrong choices remain)
+- Each use adds **2** to `hintPenalty`
+
+Hint costs are cumulative and added to the final score.
+
 ## Scoring
 
 ```
-Score = successful_moves + (wrong_answers × 2)
+Score = moves + (wrong × 2) + hintPenalty
 ```
 
-Lower is better. The theoretical minimum on a 5×5 is 5 (perfect diagonal, no wrongs).
+Lower is better. The theoretical minimum on a 5×5 is 5 (perfect diagonal, no wrongs, no hints).
 
 ### Score Ratings
 

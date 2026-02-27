@@ -42,27 +42,38 @@ Base URL: `https://bd-card-engine.fly.dev`
 ## Game Rules
 
 ### Board
-- Square grid, 4×4 to 10×10
+- Square grid, 4×4 to 8×8 (UI picker offers 4, 5, 6, 7, 8)
 - Each cell contains a trivia question from a topic
 - Each topic has an assigned color; cells are colored by topic
 
-### Start/End Positions
-- **Default**: top-left corner → bottom-right corner
-- **Reverse diagonal**: top-right → bottom-left
-- **Random corners**: game picks two opposite-ish corners
-- **Player choice**: tap any edge/corner cell to start, opposite edge/corner is the goal
-- First and last cells must be answered correctly (special rules apply)
+### Pick Your Corner (Start/End)
+All 4 corners are highlighted at game start. The player taps any corner to begin:
+- Answering that corner correctly locks it as the **start**
+- The diagonally opposite corner becomes the **goal**
+- Example: pick top-right → goal is bottom-left
+
+| Corner Picked | Goal |
+|---------------|------|
+| Top-left | Bottom-right (Classic ↘) |
+| Top-right | Bottom-left (Reverse ↙) |
+| Bottom-left | Top-right (Uphill ↗) |
+| Bottom-right | Top-left (Downhill ↖) |
 
 ### Movement
-- First move is always the start cell
+- First move is always one of the 4 corners (player's choice)
 - Each subsequent move must be adjacent (8-connected: orthogonal + diagonal) to the last **successful** cell
 - Wrong answers do NOT advance position — cell is burned/blocked
 - Available cells pulse to show they're tappable
 
+### Hints
+Two hint types are available during the question overlay:
+- **Show Hint (+1)**: Reveals the challenge's hint text (if available). Adds 1 to `hintPenalty`.
+- **Eliminate (+2)**: Removes one wrong answer choice. Adds 2 to `hintPenalty`.
+
 ### Win/Lose
 - **Win**: answer the end cell correctly
 - **Lose**: accumulate N wrong answers (varies by board size), OR run out of reachable cells
-- **Score**: successful_moves + (wrong_answers × 2) — lower is better
+- **Score**: `moves + (wrong × 2) + hintPenalty` — lower is better
 
 ### Wrong Answer Tolerance by Board Size
 | Board | Max Wrong |
@@ -71,7 +82,7 @@ Base URL: `https://bd-card-engine.fly.dev`
 | 5×5 | 3 |
 | 6×6 | 4 |
 | 7×7 | 5 |
-| 8×8–10×10 | 6 |
+| 8×8 | 6 |
 
 ## Game Variants
 
@@ -119,23 +130,19 @@ The App Clip (`QrossClip`) provides a single-game experience:
 
 ```
 Launch
-  └─ Home (animated grid background)
-       ├─ Daily Challenge (one tap to play today's board)
-       ├─ New Game
-       │    ├─ Pick Start/End (corner selector)
-       │    ├─ Pick Topics (colorful pills, 1-26)
-       │    ├─ Pick Board Size (visual preview)
-       │    ├─ Pick Variant
-       │    └─ GO → Game Board
-       │         ├─ Tap cell → Question overlay (anchored to cell)
-       │         │    ├─ Correct → glow, path extends, haptic
-       │         │    └─ Wrong → crack, shake, life lost
-       │         ├─ Win → celebration + score + share card
-       │         └─ Lose → reveal optimal path
-       ├─ Leaderboards (Game Center)
-       ├─ Stats (games played, win %, best per size)
-       ├─ Settings (difficulty, sound, haptics)
-       └─ How to Play (animated tutorial)
+  └─ Onboarding (5-page TabView, first launch only)
+       └─ Home (animated grid background)
+            ├─ Board Size picker (4-8 segmented)
+            ├─ Variant picker (Face Up / Face Down / Blind)
+            ├─ Topic picker (horizontal capsule pills)
+            ├─ Play → GamePlayView (full-screen cover)
+            │    ├─ Pick corner (all 4 highlighted)
+            │    ├─ Answer question → correct/wrong
+            │    │    ├─ Hint: Show Hint (+1) / Eliminate (+2)
+            │    ├─ Win → score card + share
+            │    └─ Lose → reason + score card
+            ├─ Leaderboards (Game Center, if authenticated)
+            └─ Stats (StatsView)
 ```
 
 ## Project Structure
@@ -145,25 +152,25 @@ qross/
 ├── project.yml              # xcodegen spec
 ├── CLAUDE.md                # This file
 ├── Docs/
-│   └── game-design.md       # Full game design document
+│   ├── game-design.md       # Full game design document
+│   └── user-manual.md       # Player-facing user manual
 ├── Qross/                   # Main app target
 │   ├── App/
-│   │   ├── QrossApp.swift
-│   │   └── ContentView.swift
+│   │   └── QrossApp.swift        # @main, RootView with onboarding gate
 │   ├── Models/
-│   │   ├── Board.swift       # Grid, cells, adjacency
-│   │   ├── GameState.swift   # Current game state machine
-│   │   ├── Topic.swift       # Topic model + colors
-│   │   ├── Challenge.swift   # Question/answer model
-│   │   └── Score.swift       # Scoring logic
+│   │   ├── Board.swift            # Grid, cells, corners, adjacency
+│   │   ├── GameState.swift        # Game state machine, corner-pick, hints
+│   │   ├── Topic.swift            # Topic model + color palette
+│   │   ├── Challenge.swift        # Question/answer/hint model
+│   │   └── Score.swift            # GameScore struct + ratings
 │   ├── Views/
-│   │   ├── HomeView.swift
-│   │   ├── TopicPickerView.swift
+│   │   ├── OnboardingView.swift   # 5-page first-launch onboarding
+│   │   ├── HomeView.swift         # Main menu with size/variant/topic pickers
+│   │   ├── GamePlayView.swift     # Full-screen game container + result overlay
 │   │   ├── BoardView.swift        # The main game grid
 │   │   ├── CellView.swift         # Individual cell rendering
-│   │   ├── QuestionOverlay.swift  # Question popup anchored to cell
-│   │   ├── ScoreView.swift        # End-of-game results
-│   │   └── StatsView.swift
+│   │   ├── QuestionOverlay.swift  # Question popup with hints
+│   │   └── StatsView.swift        # Game statistics
 │   ├── Services/
 │   │   ├── APIClient.swift        # card-engine API
 │   │   ├── QuestionCache.swift    # Offline question storage

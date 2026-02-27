@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0BBD26C0F9E7F06FA06C6D23 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC911A6463C666B4AE8BCC26 /* OnboardingView.swift */; };
 		0BEE5F26CF67FEF9FCE9EA71 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7152E319247A9A0905237356 /* APIClient.swift */; };
 		13323A5270655E23BA5F5153 /* Score.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBFA9B18707C5193434F943 /* Score.swift */; };
 		1493D4DCF0966BBEEE206F52 /* GameStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEDAB92762C99F52FF2CE9F /* GameStateTests.swift */; };
@@ -91,6 +92,7 @@
 		9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterManager.swift; sourceTree = "<group>"; };
 		9C347E629BCF88AAA8325296 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ABEFDAF3603295ECE9BF2224 /* ClipContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipContentView.swift; sourceTree = "<group>"; };
+		AC911A6463C666B4AE8BCC26 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		AE17DC01A303B70BEE63F24C /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		B8632A03B9C7368FB58E2576 /* GamePlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePlayView.swift; sourceTree = "<group>"; };
 		C724709AFEFC41F9407392EE /* QrossClip.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QrossClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -223,6 +225,7 @@
 				35ECEF08D4C40C199A3A649E /* CellView.swift */,
 				B8632A03B9C7368FB58E2576 /* GamePlayView.swift */,
 				308AC8D7C63030F44CC7C588 /* HomeView.swift */,
+				AC911A6463C666B4AE8BCC26 /* OnboardingView.swift */,
 				442CA4B722FD1114E6592067 /* QuestionOverlay.swift */,
 				2F4760C973A278CC064D914C /* StatsView.swift */,
 			);
@@ -393,6 +396,7 @@
 				3A7CD343DA6AAC18B53A141D /* GamePlayView.swift in Sources */,
 				5019EF61F2C5EAB9E6520282 /* GameState.swift in Sources */,
 				DC6F88FDDAB85108125AF16C /* HomeView.swift in Sources */,
+				0BBD26C0F9E7F06FA06C6D23 /* OnboardingView.swift in Sources */,
 				7F548234B202BCFA43B40BEB /* QrossApp.swift in Sources */,
 				A02D74D5D82B59F1128A8308 /* QuestionCache.swift in Sources */,
 				5463A68725A84BB6A49866ED /* QuestionOverlay.swift in Sources */,
