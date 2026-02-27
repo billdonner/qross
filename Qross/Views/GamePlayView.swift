@@ -9,105 +9,120 @@ struct GamePlayView: View {
         return Dictionary(uniqueKeysWithValues: colored.map { ($0.id, $0.color) })
     }
 
+    private var gameOver: Bool {
+        game.phase == .won || game.phase == .lostWrong || game.phase == .lostStuck
+    }
+
     var body: some View {
         ZStack {
             Color(.systemBackground).ignoresSafeArea()
 
-            switch game.phase {
-            case .playing:
+            if game.board != nil {
+                // Board always visible once game starts
                 BoardView(game: game, topicColors: topicColors)
 
-            case .won:
-                resultView(won: true)
+                // Result overlay when game ends
+                if gameOver {
+                    Color.black.opacity(0.5)
+                        .ignoresSafeArea()
+                        .transition(.opacity)
 
-            case .lostWrong:
-                resultView(won: false, reason: "Too many wrong answers!")
-
-            case .lostStuck:
-                resultView(won: false, reason: "No moves left!")
-
-            default:
+                    resultOverlay
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            } else {
                 ProgressView()
             }
         }
+        .animation(.spring(duration: 0.4), value: gameOver)
     }
 
-    private func resultView(won: Bool, reason: String? = nil) -> some View {
-        VStack(spacing: 24) {
-            Spacer()
+    private var resultOverlay: some View {
+        let won = game.phase == .won
+        let reason: String? = switch game.phase {
+        case .lostWrong: "Too many wrong answers!"
+        case .lostStuck: "No moves left!"
+        default: nil
+        }
 
-            // Result emoji
-            Text(won ? "🎉" : "💥")
-                .font(.system(size: 80))
-
-            Text(won ? "You Won!" : "Game Over")
-                .font(.largeTitle.bold())
+        return VStack(spacing: 16) {
+            // Result header
+            HStack(spacing: 12) {
+                Text(won ? "🎉" : "💥")
+                    .font(.system(size: 40))
+                Text(won ? "You Won!" : "Game Over")
+                    .font(.title.bold())
+            }
 
             if let reason {
                 Text(reason)
-                    .font(.title3)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
             // Score card
-            VStack(spacing: 12) {
-                HStack {
-                    Label("\(game.moveCount)", systemImage: "arrow.right.circle")
-                    Spacer()
+            HStack(spacing: 24) {
+                VStack {
+                    Text("\(game.moveCount)")
+                        .font(.title2.bold())
                     Text("moves")
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                HStack {
-                    Label("\(game.wrongCount)", systemImage: "xmark.circle")
-                    Spacer()
+                VStack {
+                    Text("\(game.wrongCount)")
+                        .font(.title2.bold())
                     Text("wrong")
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                Divider()
-                HStack {
-                    Text("Score")
-                        .font(.headline)
-                    Spacer()
+                VStack {
                     Text("\(game.score)")
                         .font(.title2.bold())
-                }
-                if won {
-                    Text("Min possible: \(game.minPossibleScore)")
+                        .foregroundStyle(won ? .green : .red)
+                    Text("score")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
-            .padding(20)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal, 40)
 
-            // Share card
             if won {
-                let shareText = game.shareText()
-                ShareLink(item: shareText) {
-                    Label("Share Result", systemImage: "square.and.arrow.up")
-                        .font(.callout.bold())
-                }
+                Text("Best possible: \(game.minPossibleScore)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
-            Spacer()
-
             // Actions
-            VStack(spacing: 12) {
+            HStack(spacing: 16) {
+                if won {
+                    let shareText = game.shareText()
+                    ShareLink(item: shareText) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                            .font(.callout.bold())
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
+                    }
+                }
+
                 Button {
                     onExit()
                 } label: {
-                    Text("Back to Home")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                    Text("Done")
+                        .font(.callout.bold())
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 10)
+                        .background(won ? Color.green : Color.blue)
+                        .foregroundStyle(.white)
+                        .clipShape(Capsule())
                 }
             }
-            .padding(.horizontal, 40)
-            .padding(.bottom, 32)
         }
+        .padding(24)
+        .background(.ultraThickMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(radius: 20)
+        .padding(.horizontal, 24)
     }
 }
