@@ -212,6 +212,8 @@ struct HomeView: View {
         do {
             let topics = try await QrossAPI.fetchCategories()
             availableTopics = topics.filter { $0.questionCount >= 20 }
+            // Auto-select first 3 topics so play button works immediately
+            game.selectedTopics = Array(availableTopics.prefix(3))
         } catch {
             errorMessage = "Could not load topics. Check your connection."
         }

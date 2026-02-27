@@ -30,23 +30,24 @@ struct QrossAPI {
         }
         let decoded = try JSONDecoder().decode(GameDataResponse.self, from: data)
         let selectedCats = categories.map(Set.init)
-        return decoded.decks.flatMap { deck -> [Challenge] in
-            if let cats = selectedCats, !cats.contains(deck.title) { return [] }
-            return deck.cards.map { card in
-                let choices = (card.properties.choices ?? []).map {
-                    Choice(text: $0.text, isCorrect: $0.isCorrect)
-                }
-                return Challenge(
-                    id: UUID(uuidString: card.id) ?? UUID(),
-                    question: card.question,
-                    choices: choices,
-                    correctIndex: card.properties.correctIndex ?? 0,
-                    difficulty: Challenge.Difficulty(rawValue: card.difficulty) ?? .medium,
-                    topicId: deck.title,
-                    hint: card.properties.hint,
-                    explanation: card.properties.explanation
-                )
+        return decoded.challenges.compactMap { item -> Challenge? in
+            if let cats = selectedCats, !cats.contains(item.topic) { return nil }
+            // Build choices from answers array + correct string
+            let correctAnswer = item.correct
+            let choices = item.answers.map { ans in
+                Choice(text: ans, isCorrect: ans == correctAnswer)
             }
+            let correctIndex = item.answers.firstIndex(of: correctAnswer) ?? 0
+            return Challenge(
+                id: UUID(uuidString: item.id) ?? UUID(),
+                question: item.question,
+                choices: choices,
+                correctIndex: correctIndex,
+                difficulty: .medium,
+                topicId: item.topic,
+                hint: nil,
+                explanation: item.explanation
+            )
         }
     }
 }
@@ -63,33 +64,14 @@ private struct CategoriesResponse: Decodable {
 }
 
 private struct GameDataResponse: Decodable {
-    let decks: [DeckItem]
+    let challenges: [ChallengeItem]
 
-    struct DeckItem: Decodable {
-        let title: String
-        let cards: [CardItem]
-    }
-
-    struct CardItem: Decodable {
+    struct ChallengeItem: Decodable {
         let id: String
+        let topic: String
         let question: String
-        let difficulty: String
-        let properties: CardProperties
-    }
-
-    struct CardProperties: Decodable {
-        let choices: [ChoiceItem]?
-        let correctIndex: Int?
-        let hint: String?
+        let answers: [String]
+        let correct: String
         let explanation: String?
-
-        enum CodingKeys: String, CodingKey {
-            case choices, correctIndex = "correct_index", hint, explanation
-        }
-    }
-
-    struct ChoiceItem: Decodable {
-        let text: String
-        let isCorrect: Bool
     }
 }
