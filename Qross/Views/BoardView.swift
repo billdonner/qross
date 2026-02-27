@@ -65,9 +65,15 @@ struct BoardView: View {
                 Text("Qross")
                     .font(.title2.bold())
                 if let board = game.board {
-                    Text("\(board.size)×\(board.size) \(board.cornerPair.arrow)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if game.choosingCorner {
+                        Text("\(board.size)×\(board.size) — Pick a corner!")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    } else {
+                        Text("\(board.size)×\(board.size) \(board.cornerPair.arrow)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
 
@@ -97,12 +103,15 @@ struct BoardView: View {
                 let col = index % board.size
                 let pos = CellPosition(row: row, col: col)
                 let cell = board[pos]
+                let isCorner = board.corners.contains(pos)
+                let isStart = game.choosingCorner ? (isCorner && cell.state == .available) : pos == board.startPosition
+                let isEnd = game.choosingCorner ? false : pos == board.endPosition
                 CellView(
                     cell: cell,
                     topicColor: topicColors[cell.topicColor] ?? .blue,
                     variant: game.variant,
-                    isStart: pos == board.startPosition,
-                    isEnd: pos == board.endPosition,
+                    isStart: isStart,
+                    isEnd: isEnd,
                     onTap: {
                         activeCell = pos
                         showQuestion = true

@@ -52,6 +52,11 @@ final class GameState {
         (board?.maxWrong ?? 3) - wrongCount
     }
 
+    /// True while player hasn't locked in a starting corner yet
+    var choosingCorner: Bool {
+        phase == .playing && currentPosition == nil
+    }
+
     // MARK: - Setup
 
     func startGame(questions: [Challenge]) {
@@ -65,8 +70,10 @@ final class GameState {
             seed: seed
         )
 
-        // Mark start cell as available
-        newBoard[newBoard.startPosition].state = .available
+        // Mark all 4 corners as available — player picks their start
+        for corner in newBoard.corners {
+            newBoard[corner].state = .available
+        }
 
         board = newBoard
         currentPosition = nil
@@ -81,12 +88,11 @@ final class GameState {
     func availableCells() -> [CellPosition] {
         guard let board else { return [] }
         guard let pos = currentPosition else {
-            // First move — only start cell, if not already answered
-            let startCell = board[board.startPosition]
-            if startCell.state == .untouched || startCell.state == .available {
-                return [board.startPosition]
+            // No move yet — all untried corners are available
+            return board.corners.filter { corner in
+                let state = board[corner].state
+                return state == .available || state == .untouched
             }
-            return []
         }
         return pos.neighbors(gridSize: board.size).filter { p in
             let cell = board[p]
@@ -117,12 +123,20 @@ final class GameState {
         guard var board, phase == .playing else { return }
         let cell = board[position]
         let isCorrect = choiceIndex == cell.challenge.correctIndex
+        let isCornerPick = currentPosition == nil  // choosing starting corner
 
         if isCorrect {
             board[position].state = .correct
             currentPosition = position
             moveCount += 1
             path.append(position)
+
+            // First correct answer locks in start/end corners
+            if isCornerPick {
+                board.startPosition = position
+                board.endPosition = Board.oppositeCorner(of: position, gridSize: board.size)
+                board.cornerPair = Board.cornerPair(for: position, gridSize: board.size)
+            }
 
             // Check win
             if position == board.endPosition {

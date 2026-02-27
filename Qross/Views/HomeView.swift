@@ -51,19 +51,6 @@ struct HomeView: View {
                             .pickerStyle(.segmented)
                         }
 
-                        // Corner picker
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Direction")
-                                .font(.caption.bold())
-                                .foregroundStyle(.secondary)
-                            Picker("Corner", selection: $game.cornerPair) {
-                                ForEach(CornerPair.allCases) { cp in
-                                    Text("\(cp.arrow) \(cp.rawValue)").tag(cp)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                        }
-
                         // Variant picker
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Variant")

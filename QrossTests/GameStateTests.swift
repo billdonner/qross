@@ -34,36 +34,58 @@ final class GameStateTests: XCTestCase {
         XCTAssertEqual(game.wrongCount, 0)
         XCTAssertNotNil(game.board)
         XCTAssertEqual(game.board?.size, 4)
+        XCTAssertTrue(game.choosingCorner, "Should be in corner-choosing phase")
     }
 
-    func testCorrectAnswer() {
+    func testAllCornersAvailableAtStart() {
+        let game = GameState()
+        game.selectedTopics = [Topic(id: "test", name: "Test", questionCount: 100)]
+        game.boardSize = 5
+        game.startGame(questions: makeQuestions(count: 30))
+
+        let board = game.board!
+        for corner in board.corners {
+            XCTAssertEqual(board[corner].state, .available, "Corner \(corner) should be available")
+        }
+    }
+
+    func testCorrectCornerLocksStartEnd() {
         let game = GameState()
         game.selectedTopics = [Topic(id: "test", name: "Test", questionCount: 100)]
         game.boardSize = 4
         game.startGame(questions: makeQuestions(count: 20))
 
-        let start = game.board!.startPosition
-        game.answerCell(at: start, choiceIndex: 1) // correct
+        // Pick top-left corner (0,0) — correct answer
+        let topLeft = CellPosition(row: 0, col: 0)
+        game.answerCell(at: topLeft, choiceIndex: 1)
 
         XCTAssertEqual(game.moveCount, 1)
         XCTAssertEqual(game.wrongCount, 0)
-        XCTAssertEqual(game.currentPosition, start)
-        XCTAssertEqual(game.board![start].state, .correct)
+        XCTAssertEqual(game.currentPosition, topLeft)
+        XCTAssertEqual(game.board!.startPosition, topLeft)
+        XCTAssertEqual(game.board!.endPosition, CellPosition(row: 3, col: 3))
+        XCTAssertFalse(game.choosingCorner)
     }
 
-    func testWrongAnswer() {
+    func testWrongCornerAllowsRetry() {
         let game = GameState()
         game.selectedTopics = [Topic(id: "test", name: "Test", questionCount: 100)]
         game.boardSize = 4
         game.startGame(questions: makeQuestions(count: 20))
 
-        let start = game.board!.startPosition
-        game.answerCell(at: start, choiceIndex: 0) // wrong
+        // Get wrong on top-left corner
+        let topLeft = CellPosition(row: 0, col: 0)
+        game.answerCell(at: topLeft, choiceIndex: 0) // wrong
 
-        XCTAssertEqual(game.moveCount, 0)
         XCTAssertEqual(game.wrongCount, 1)
         XCTAssertNil(game.currentPosition)
-        XCTAssertEqual(game.board![start].state, .wrong)
+        XCTAssertTrue(game.choosingCorner, "Should still be choosing a corner")
+        XCTAssertEqual(game.board![topLeft].state, .wrong)
+
+        // Other corners should still be available
+        let available = game.availableCells()
+        XCTAssertEqual(available.count, 3, "3 corners should remain available")
+        XCTAssertFalse(available.contains(topLeft), "Burned corner should not be available")
     }
 
     func testScoreCalculation() {

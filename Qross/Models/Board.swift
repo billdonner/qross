@@ -76,10 +76,38 @@ enum CornerPair: String, Codable, CaseIterable, Identifiable {
 struct Board: Codable {
     let size: Int
     var cells: [[Cell]]  // [row][col]
-    let startPosition: CellPosition
-    let endPosition: CellPosition
-    let cornerPair: CornerPair
+    var startPosition: CellPosition
+    var endPosition: CellPosition
+    var cornerPair: CornerPair
     let topics: [String]  // topic IDs used
+
+    /// All four corner positions
+    var corners: [CellPosition] {
+        let last = size - 1
+        return [
+            CellPosition(row: 0, col: 0),
+            CellPosition(row: 0, col: last),
+            CellPosition(row: last, col: 0),
+            CellPosition(row: last, col: last),
+        ]
+    }
+
+    /// Given a corner, return the opposite corner
+    static func oppositeCorner(of pos: CellPosition, gridSize: Int) -> CellPosition {
+        let last = gridSize - 1
+        return CellPosition(row: last - pos.row, col: last - pos.col)
+    }
+
+    /// Given a corner, return the matching CornerPair
+    static func cornerPair(for start: CellPosition, gridSize: Int) -> CornerPair {
+        let last = gridSize - 1
+        switch (start.row, start.col) {
+        case (0, 0): return .topLeftToBottomRight
+        case (0, let c) where c == last: return .topRightToBottomLeft
+        case (let r, 0) where r == last: return .bottomLeftToTopRight
+        default: return .bottomRightToTopLeft
+        }
+    }
 
     /// Max wrong answers allowed for this board size
     var maxWrong: Int {
