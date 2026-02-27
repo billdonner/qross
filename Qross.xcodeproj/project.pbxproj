@@ -1,0 +1,695 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0BEE5F26CF67FEF9FCE9EA71 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7152E319247A9A0905237356 /* APIClient.swift */; };
+		13323A5270655E23BA5F5153 /* Score.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBFA9B18707C5193434F943 /* Score.swift */; };
+		1493D4DCF0966BBEEE206F52 /* GameStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEDAB92762C99F52FF2CE9F /* GameStateTests.swift */; };
+		302006E1AA2BE2399134FCDF /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35ECEF08D4C40C199A3A649E /* CellView.swift */; };
+		3A7CD343DA6AAC18B53A141D /* GamePlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8632A03B9C7368FB58E2576 /* GamePlayView.swift */; };
+		41FE52523C88B9E3579898EB /* BoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724AB9B07254AE9926727600 /* BoardTests.swift */; };
+		4F642B9C16ADE2221AF39A9D /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E047560292F5DF643743D490 /* Challenge.swift */; };
+		5019EF61F2C5EAB9E6520282 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EDB4BA3A64DC471AF5AC71 /* GameState.swift */; };
+		53CBDBCD6DC29C418F057D84 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17DC01A303B70BEE63F24C /* Board.swift */; };
+		5463A68725A84BB6A49866ED /* QuestionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442CA4B722FD1114E6592067 /* QuestionOverlay.swift */; };
+		5C45B963746A173D35FE7A19 /* QrossClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F6465635D9A2BF4FC9C3A9 /* QrossClipApp.swift */; };
+		5E3B94FD4FBF3811AD3667ED /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E73F6D3994088CFADEA3A39A /* Topic.swift */; };
+		6100025305838FA09ED56C3F /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17DC01A303B70BEE63F24C /* Board.swift */; };
+		63E4F6EDD64BA9922F137246 /* QuestionCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */; };
+		766463FC4307AFE22E52FAD4 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAA383C294C2DC4F129AFB /* BoardView.swift */; };
+		7F548234B202BCFA43B40BEB /* QrossApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D703B003C8D07321C1ADD2E /* QrossApp.swift */; };
+		828FBABB320D45857D19C8FF /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7152E319247A9A0905237356 /* APIClient.swift */; };
+		92A495B12046A91A70AE45BD /* Score.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBFA9B18707C5193434F943 /* Score.swift */; };
+		94C173EB4AF55E0C1DCB2146 /* ClipContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEFDAF3603295ECE9BF2224 /* ClipContentView.swift */; };
+		99B9C8A938D6D215B7D346CB /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E73F6D3994088CFADEA3A39A /* Topic.swift */; };
+		A02D74D5D82B59F1128A8308 /* QuestionCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */; };
+		A0369AC75A5ABEBE9200F9C1 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EDB4BA3A64DC471AF5AC71 /* GameState.swift */; };
+		A11890699C6B5962D528BB57 /* QrossClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = C724709AFEFC41F9407392EE /* QrossClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AC2DC16490FC8546AB4D7DA6 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E047560292F5DF643743D490 /* Challenge.swift */; };
+		AF548D2A5050F8D0DDC0D5AE /* QuestionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442CA4B722FD1114E6592067 /* QuestionOverlay.swift */; };
+		BBD73AA44CABFE7F0AEBB052 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4760C973A278CC064D914C /* StatsView.swift */; };
+		C0A278491433A32134486AAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9553A485CFD8C8247E9D385 /* Assets.xcassets */; };
+		C47BB130DCF7B915B3B2BB51 /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35ECEF08D4C40C199A3A649E /* CellView.swift */; };
+		CC17821E9FAAD5B455491F42 /* GameCenterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */; };
+		D117FF714A9003CA33AF4F2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E83EBDDBD5B63D31DE218CE /* Assets.xcassets */; };
+		DC6F88FDDAB85108125AF16C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308AC8D7C63030F44CC7C588 /* HomeView.swift */; };
+		F03614A7EFDEE5D486AA110F /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAA383C294C2DC4F129AFB /* BoardView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		444DD4D2535DA33E74785E78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 360643400DC8BA8696284ED9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E42174C9DB79CA9E7700B5FA;
+			remoteInfo = Qross;
+		};
+		5BA17A7A7F93C0574A6C9422 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 360643400DC8BA8696284ED9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5233C579730B0B5293092CB3;
+			remoteInfo = QrossClip;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9ECB10FC976930932765F922 /* Embed App Clips */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
+			dstSubfolderSpec = 16;
+			files = (
+				A11890699C6B5962D528BB57 /* QrossClip.app in Embed App Clips */,
+			);
+			name = "Embed App Clips";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1D3298107FE7F0D01A38B0C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2E83EBDDBD5B63D31DE218CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2F4760C973A278CC064D914C /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		308AC8D7C63030F44CC7C588 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		35ECEF08D4C40C199A3A649E /* CellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CellView.swift; path = Qross/Views/CellView.swift; sourceTree = "<group>"; };
+		3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuestionCache.swift; path = Qross/Services/QuestionCache.swift; sourceTree = "<group>"; };
+		442CA4B722FD1114E6592067 /* QuestionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuestionOverlay.swift; path = Qross/Views/QuestionOverlay.swift; sourceTree = "<group>"; };
+		44D886EB7BC044835E653E49 /* QrossClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QrossClip.entitlements; sourceTree = "<group>"; };
+		48DC8159D3F9FEFD4B5FA70E /* Qross.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Qross.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DEAA383C294C2DC4F129AFB /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BoardView.swift; path = Qross/Views/BoardView.swift; sourceTree = "<group>"; };
+		5255B78D89DCDCBCDF1B184C /* QrossTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = QrossTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D703B003C8D07321C1ADD2E /* QrossApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrossApp.swift; sourceTree = "<group>"; };
+		68F6465635D9A2BF4FC9C3A9 /* QrossClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrossClipApp.swift; sourceTree = "<group>"; };
+		7152E319247A9A0905237356 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APIClient.swift; path = Qross/Services/APIClient.swift; sourceTree = "<group>"; };
+		724AB9B07254AE9926727600 /* BoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardTests.swift; sourceTree = "<group>"; };
+		9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterManager.swift; sourceTree = "<group>"; };
+		9C347E629BCF88AAA8325296 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		ABEFDAF3603295ECE9BF2224 /* ClipContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipContentView.swift; sourceTree = "<group>"; };
+		AE17DC01A303B70BEE63F24C /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
+		B8632A03B9C7368FB58E2576 /* GamePlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePlayView.swift; sourceTree = "<group>"; };
+		C724709AFEFC41F9407392EE /* QrossClip.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QrossClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFBFA9B18707C5193434F943 /* Score.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Score.swift; sourceTree = "<group>"; };
+		D1C8C607B984B2ED2346D1B0 /* Qross.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Qross.entitlements; sourceTree = "<group>"; };
+		D9553A485CFD8C8247E9D385 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E047560292F5DF643743D490 /* Challenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Challenge.swift; sourceTree = "<group>"; };
+		E73F6D3994088CFADEA3A39A /* Topic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Topic.swift; sourceTree = "<group>"; };
+		EAEDAB92762C99F52FF2CE9F /* GameStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStateTests.swift; sourceTree = "<group>"; };
+		F9EDB4BA3A64DC471AF5AC71 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		117266B5329E9578839AAB07 /* Qross */ = {
+			isa = PBXGroup;
+			children = (
+				D9553A485CFD8C8247E9D385 /* Assets.xcassets */,
+				1D3298107FE7F0D01A38B0C3 /* Info.plist */,
+				D1C8C607B984B2ED2346D1B0 /* Qross.entitlements */,
+				C5D72D22DDE71B38FDB2DA66 /* App */,
+				8F874E5B4DC4D764B4C1A4E5 /* Models */,
+				82B39FB058597F38D1398190 /* Services */,
+				D0AE5CF17A9BD5DBE1FD3B1F /* Views */,
+			);
+			path = Qross;
+			sourceTree = "<group>";
+		};
+		16D352779592F4414649E5CE = {
+			isa = PBXGroup;
+			children = (
+				117266B5329E9578839AAB07 /* Qross */,
+				E7C243813DEBB989321A2630 /* QrossClip */,
+				18EB540E52BD9E1AFE8B9C82 /* QrossTests */,
+				9B21082B8AB48E697F0DC507 /* Shared */,
+				5CE21584C4B78643972D7E90 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		18EB540E52BD9E1AFE8B9C82 /* QrossTests */ = {
+			isa = PBXGroup;
+			children = (
+				724AB9B07254AE9926727600 /* BoardTests.swift */,
+				EAEDAB92762C99F52FF2CE9F /* GameStateTests.swift */,
+			);
+			path = QrossTests;
+			sourceTree = "<group>";
+		};
+		3B2BD4D359BB826540E7D0F7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8F874E5B4DC4D764B4C1A4E5 /* Models */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		5CE21584C4B78643972D7E90 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				48DC8159D3F9FEFD4B5FA70E /* Qross.app */,
+				C724709AFEFC41F9407392EE /* QrossClip.app */,
+				5255B78D89DCDCBCDF1B184C /* QrossTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		63A24943E889D22299D6833A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4DEAA383C294C2DC4F129AFB /* BoardView.swift */,
+				35ECEF08D4C40C199A3A649E /* CellView.swift */,
+				442CA4B722FD1114E6592067 /* QuestionOverlay.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		82B39FB058597F38D1398190 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				7152E319247A9A0905237356 /* APIClient.swift */,
+				9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */,
+				3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		8F874E5B4DC4D764B4C1A4E5 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AE17DC01A303B70BEE63F24C /* Board.swift */,
+				E047560292F5DF643743D490 /* Challenge.swift */,
+				F9EDB4BA3A64DC471AF5AC71 /* GameState.swift */,
+				CFBFA9B18707C5193434F943 /* Score.swift */,
+				E73F6D3994088CFADEA3A39A /* Topic.swift */,
+			);
+			name = Models;
+			path = Qross/Models;
+			sourceTree = "<group>";
+		};
+		9B21082B8AB48E697F0DC507 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				3B2BD4D359BB826540E7D0F7 /* Models */,
+				C69093C8B66FBC48CA17A312 /* Services */,
+				63A24943E889D22299D6833A /* Views */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		C5D72D22DDE71B38FDB2DA66 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				5D703B003C8D07321C1ADD2E /* QrossApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C69093C8B66FBC48CA17A312 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				7152E319247A9A0905237356 /* APIClient.swift */,
+				3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */,
+			);
+			name = Services;
+			sourceTree = "<group>";
+		};
+		D0AE5CF17A9BD5DBE1FD3B1F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4DEAA383C294C2DC4F129AFB /* BoardView.swift */,
+				35ECEF08D4C40C199A3A649E /* CellView.swift */,
+				B8632A03B9C7368FB58E2576 /* GamePlayView.swift */,
+				308AC8D7C63030F44CC7C588 /* HomeView.swift */,
+				442CA4B722FD1114E6592067 /* QuestionOverlay.swift */,
+				2F4760C973A278CC064D914C /* StatsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E7C243813DEBB989321A2630 /* QrossClip */ = {
+			isa = PBXGroup;
+			children = (
+				2E83EBDDBD5B63D31DE218CE /* Assets.xcassets */,
+				ABEFDAF3603295ECE9BF2224 /* ClipContentView.swift */,
+				9C347E629BCF88AAA8325296 /* Info.plist */,
+				44D886EB7BC044835E653E49 /* QrossClip.entitlements */,
+				68F6465635D9A2BF4FC9C3A9 /* QrossClipApp.swift */,
+			);
+			path = QrossClip;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5233C579730B0B5293092CB3 /* QrossClip */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 983742CA77A34E5B277A5FAC /* Build configuration list for PBXNativeTarget "QrossClip" */;
+			buildPhases = (
+				11E18C6BB15F077F95FA7944 /* Sources */,
+				6471BA6B25C6CD848987A11D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = QrossClip;
+			packageProductDependencies = (
+			);
+			productName = QrossClip;
+			productReference = C724709AFEFC41F9407392EE /* QrossClip.app */;
+			productType = "com.apple.product-type.application.on-demand-install-capable";
+		};
+		9E00102B399D0258D8A95FE1 /* QrossTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3DD23F9B8B00BEA165E6D33 /* Build configuration list for PBXNativeTarget "QrossTests" */;
+			buildPhases = (
+				818D713F67C56880A5F336AC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8C1EFF06E2F5725D0EF1AA28 /* PBXTargetDependency */,
+			);
+			name = QrossTests;
+			packageProductDependencies = (
+			);
+			productName = QrossTests;
+			productReference = 5255B78D89DCDCBCDF1B184C /* QrossTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E42174C9DB79CA9E7700B5FA /* Qross */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 370C460CDD5FEB8ACF69DFBA /* Build configuration list for PBXNativeTarget "Qross" */;
+			buildPhases = (
+				1523E4EB3A8B88F44A89EE28 /* Sources */,
+				EC06BA68508E6B62FFB719C4 /* Resources */,
+				9ECB10FC976930932765F922 /* Embed App Clips */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6C6FC8F42028D9C8AAF08DAD /* PBXTargetDependency */,
+			);
+			name = Qross;
+			packageProductDependencies = (
+			);
+			productName = Qross;
+			productReference = 48DC8159D3F9FEFD4B5FA70E /* Qross.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		360643400DC8BA8696284ED9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					5233C579730B0B5293092CB3 = {
+						DevelopmentTeam = NEAY582ME4;
+					};
+					9E00102B399D0258D8A95FE1 = {
+						DevelopmentTeam = NEAY582ME4;
+					};
+					E42174C9DB79CA9E7700B5FA = {
+						DevelopmentTeam = NEAY582ME4;
+					};
+				};
+			};
+			buildConfigurationList = 70153AFE85B0D7F6A2988AC2 /* Build configuration list for PBXProject "Qross" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 16D352779592F4414649E5CE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E42174C9DB79CA9E7700B5FA /* Qross */,
+				5233C579730B0B5293092CB3 /* QrossClip */,
+				9E00102B399D0258D8A95FE1 /* QrossTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6471BA6B25C6CD848987A11D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D117FF714A9003CA33AF4F2E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC06BA68508E6B62FFB719C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0A278491433A32134486AAB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		11E18C6BB15F077F95FA7944 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				828FBABB320D45857D19C8FF /* APIClient.swift in Sources */,
+				53CBDBCD6DC29C418F057D84 /* Board.swift in Sources */,
+				766463FC4307AFE22E52FAD4 /* BoardView.swift in Sources */,
+				C47BB130DCF7B915B3B2BB51 /* CellView.swift in Sources */,
+				4F642B9C16ADE2221AF39A9D /* Challenge.swift in Sources */,
+				94C173EB4AF55E0C1DCB2146 /* ClipContentView.swift in Sources */,
+				A0369AC75A5ABEBE9200F9C1 /* GameState.swift in Sources */,
+				5C45B963746A173D35FE7A19 /* QrossClipApp.swift in Sources */,
+				63E4F6EDD64BA9922F137246 /* QuestionCache.swift in Sources */,
+				AF548D2A5050F8D0DDC0D5AE /* QuestionOverlay.swift in Sources */,
+				92A495B12046A91A70AE45BD /* Score.swift in Sources */,
+				5E3B94FD4FBF3811AD3667ED /* Topic.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1523E4EB3A8B88F44A89EE28 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0BEE5F26CF67FEF9FCE9EA71 /* APIClient.swift in Sources */,
+				6100025305838FA09ED56C3F /* Board.swift in Sources */,
+				F03614A7EFDEE5D486AA110F /* BoardView.swift in Sources */,
+				302006E1AA2BE2399134FCDF /* CellView.swift in Sources */,
+				AC2DC16490FC8546AB4D7DA6 /* Challenge.swift in Sources */,
+				CC17821E9FAAD5B455491F42 /* GameCenterManager.swift in Sources */,
+				3A7CD343DA6AAC18B53A141D /* GamePlayView.swift in Sources */,
+				5019EF61F2C5EAB9E6520282 /* GameState.swift in Sources */,
+				DC6F88FDDAB85108125AF16C /* HomeView.swift in Sources */,
+				7F548234B202BCFA43B40BEB /* QrossApp.swift in Sources */,
+				A02D74D5D82B59F1128A8308 /* QuestionCache.swift in Sources */,
+				5463A68725A84BB6A49866ED /* QuestionOverlay.swift in Sources */,
+				13323A5270655E23BA5F5153 /* Score.swift in Sources */,
+				BBD73AA44CABFE7F0AEBB052 /* StatsView.swift in Sources */,
+				99B9C8A938D6D215B7D346CB /* Topic.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		818D713F67C56880A5F336AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				41FE52523C88B9E3579898EB /* BoardTests.swift in Sources */,
+				1493D4DCF0966BBEEE206F52 /* GameStateTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6C6FC8F42028D9C8AAF08DAD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5233C579730B0B5293092CB3 /* QrossClip */;
+			targetProxy = 5BA17A7A7F93C0574A6C9422 /* PBXContainerItemProxy */;
+		};
+		8C1EFF06E2F5725D0EF1AA28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E42174C9DB79CA9E7700B5FA /* Qross */;
+			targetProxy = 444DD4D2535DA33E74785E78 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		398A0CE38F665547FDF86C06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.billdonner.qross.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Qross.app/Qross";
+			};
+			name = Debug;
+		};
+		773C4D44A7951D0750C92C3B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.billdonner.qross.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Qross.app/Qross";
+			};
+			name = Release;
+		};
+		7C008FB0E6A21AB48E2B7C23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = QrossClip/QrossClip.entitlements;
+				INFOPLIST_FILE = QrossClip/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.billdonner.qross.Clip;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		87AD0D1411CB245CC3245B84 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = NEAY582ME4;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		933BA6E0007711A21EF3DE9B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = QrossClip/QrossClip.entitlements;
+				INFOPLIST_FILE = QrossClip/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.billdonner.qross.Clip;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A340819CC0DE59D50FF42A09 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Qross/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.billdonner.qross;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E775F4145E369C42310E0C99 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Qross/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.billdonner.qross;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F12A56F9DF4EBF168E258B59 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = NEAY582ME4;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		370C460CDD5FEB8ACF69DFBA /* Build configuration list for PBXNativeTarget "Qross" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E775F4145E369C42310E0C99 /* Debug */,
+				A340819CC0DE59D50FF42A09 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		70153AFE85B0D7F6A2988AC2 /* Build configuration list for PBXProject "Qross" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F12A56F9DF4EBF168E258B59 /* Debug */,
+				87AD0D1411CB245CC3245B84 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		983742CA77A34E5B277A5FAC /* Build configuration list for PBXNativeTarget "QrossClip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				933BA6E0007711A21EF3DE9B /* Debug */,
+				7C008FB0E6A21AB48E2B7C23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C3DD23F9B8B00BEA165E6D33 /* Build configuration list for PBXNativeTarget "QrossTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				398A0CE38F665547FDF86C06 /* Debug */,
+				773C4D44A7951D0750C92C3B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 360643400DC8BA8696284ED9 /* Project object */;
+}
