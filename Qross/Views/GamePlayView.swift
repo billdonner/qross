@@ -19,27 +19,7 @@ struct GamePlayView: View {
 
             if game.board != nil {
                 // Board always visible once game starts
-                BoardView(game: game, topicColors: topicColors)
-
-                // Quit button (top-right corner during play)
-                if !gameOver {
-                    VStack {
-                        HStack {
-                            Spacer()
-                            Button {
-                                onExit()
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .font(.title2)
-                                    .symbolRenderingMode(.hierarchical)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding(.trailing, 16)
-                            .padding(.top, 12)
-                        }
-                        Spacer()
-                    }
-                }
+                BoardView(game: game, topicColors: topicColors, onQuit: gameOver ? nil : onExit)
 
                 // Result overlay when game ends
                 if gameOver {

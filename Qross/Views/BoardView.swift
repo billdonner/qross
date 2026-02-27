@@ -3,6 +3,7 @@ import SwiftUI
 struct BoardView: View {
     @Bindable var game: GameState
     var topicColors: [String: Color]
+    var onQuit: (() -> Void)?
 
     @State private var activeCell: CellPosition?
     @State private var showQuestion = false
@@ -81,6 +82,15 @@ struct BoardView: View {
             }
 
             Spacer()
+
+            if let onQuit {
+                Button(action: onQuit) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.secondary)
+                }
+            }
 
             VStack(alignment: .trailing) {
                 Text("\(game.moveCount) moves")
