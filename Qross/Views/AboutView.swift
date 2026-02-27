@@ -58,7 +58,7 @@ struct AboutView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
-                        Text("Built by Bill Donner")
+                        Text("Built by Bill Donner and Claude Code")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Text("Inspired by Carol Friedman")

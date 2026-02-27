@@ -18,20 +18,26 @@ struct GamePlayView: View {
             Color(.systemBackground).ignoresSafeArea()
 
             if game.board != nil {
-                VStack(spacing: 0) {
-                    // Board always visible once game starts
-                    BoardView(game: game, topicColors: topicColors)
+                // Board always visible once game starts
+                BoardView(game: game, topicColors: topicColors)
 
-                    // Quit button during play
-                    if !gameOver {
-                        Button {
-                            onExit()
-                        } label: {
-                            Label("Quit Game", systemImage: "xmark.circle")
-                                .font(.callout)
-                                .foregroundStyle(.secondary)
+                // Quit button (top-right corner during play)
+                if !gameOver {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Button {
+                                onExit()
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.title2)
+                                    .symbolRenderingMode(.hierarchical)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.trailing, 16)
+                            .padding(.top, 12)
                         }
-                        .padding(.bottom, 8)
+                        Spacer()
                     }
                 }
 
