@@ -7,6 +7,7 @@ struct BoardView: View {
 
     @State private var activeCell: CellPosition?
     @State private var showQuestion = false
+    @State private var showQuitConfirm = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -59,6 +60,12 @@ struct BoardView: View {
             }
         }
         .animation(.spring(duration: 0.3), value: showQuestion)
+        .alert("Quit Game?", isPresented: $showQuitConfirm) {
+            Button("Keep Playing", role: .cancel) { }
+            Button("Quit", role: .destructive) { onQuit?() }
+        } message: {
+            Text("Your progress will be lost.")
+        }
     }
 
     // MARK: - Header
@@ -82,15 +89,6 @@ struct BoardView: View {
             }
 
             Spacer()
-
-            if let onQuit {
-                Button(action: onQuit) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(.secondary)
-                }
-            }
 
             VStack(alignment: .trailing) {
                 Text("\(game.moveCount) moves")
@@ -144,6 +142,19 @@ struct BoardView: View {
                     Image(systemName: i < game.livesRemaining ? "heart.fill" : "heart")
                         .foregroundStyle(i < game.livesRemaining ? .red : .gray)
                         .font(.caption)
+                }
+            }
+
+            if onQuit != nil {
+                Button {
+                    showQuitConfirm = true
+                } label: {
+                    Text("Quit")
+                        .font(.callout.bold())
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(.red, in: Capsule())
                 }
             }
 
