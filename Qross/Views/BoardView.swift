@@ -150,11 +150,8 @@ struct BoardView: View {
                     showQuitConfirm = true
                 } label: {
                     Text("Quit")
-                        .font(.callout.bold())
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                        .background(.red, in: Capsule())
+                        .font(.caption.bold())
+                        .foregroundStyle(.red)
                 }
             }
 
