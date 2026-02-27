@@ -64,3 +64,4 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.billdonner.qross.tests
+        GENERATE_INFOPLIST_FILE: YES

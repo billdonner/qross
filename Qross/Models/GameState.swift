@@ -81,8 +81,12 @@ final class GameState {
     func availableCells() -> [CellPosition] {
         guard let board else { return [] }
         guard let pos = currentPosition else {
-            // First move — only start cell
-            return [board.startPosition]
+            // First move — only start cell, if not already answered
+            let startCell = board[board.startPosition]
+            if startCell.state == .untouched || startCell.state == .available {
+                return [board.startPosition]
+            }
+            return []
         }
         return pos.neighbors(gridSize: board.size).filter { p in
             let cell = board[p]
@@ -92,7 +96,7 @@ final class GameState {
 
     func updateAvailability() {
         guard var board else { return }
-        // Reset all untouched/available to untouched
+        // Reset available cells back to untouched (preserve correct/wrong)
         for r in 0..<board.size {
             for c in 0..<board.size {
                 if board.cells[r][c].state == .available {
@@ -100,9 +104,11 @@ final class GameState {
                 }
             }
         }
-        // Mark available cells
+        // Mark reachable untouched cells as available
         for pos in availableCells() {
-            board[pos].state = .available
+            if board[pos].state == .untouched {
+                board[pos].state = .available
+            }
         }
         self.board = board
     }
