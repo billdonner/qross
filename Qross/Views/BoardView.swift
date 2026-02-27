@@ -87,26 +87,27 @@ struct BoardView: View {
 
     private func grid(board: Board) -> some View {
         let spacing: CGFloat = 4
+        let total = board.size * board.size
         return LazyVGrid(
             columns: Array(repeating: GridItem(.flexible(), spacing: spacing), count: board.size),
             spacing: spacing
         ) {
-            ForEach(0..<board.size, id: \.self) { row in
-                ForEach(0..<board.size, id: \.self) { col in
-                    let pos = CellPosition(row: row, col: col)
-                    let cell = board[pos]
-                    CellView(
-                        cell: cell,
-                        topicColor: topicColors[cell.topicColor] ?? .blue,
-                        variant: game.variant,
-                        isStart: pos == board.startPosition,
-                        isEnd: pos == board.endPosition,
-                        onTap: {
-                            activeCell = pos
-                            showQuestion = true
-                        }
-                    )
-                }
+            ForEach(0..<total, id: \.self) { index in
+                let row = index / board.size
+                let col = index % board.size
+                let pos = CellPosition(row: row, col: col)
+                let cell = board[pos]
+                CellView(
+                    cell: cell,
+                    topicColor: topicColors[cell.topicColor] ?? .blue,
+                    variant: game.variant,
+                    isStart: pos == board.startPosition,
+                    isEnd: pos == board.endPosition,
+                    onTap: {
+                        activeCell = pos
+                        showQuestion = true
+                    }
+                )
             }
         }
     }
