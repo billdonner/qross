@@ -61,7 +61,7 @@ struct GamePlayView: View {
             }
 
             // Score card
-            HStack(spacing: 24) {
+            HStack(spacing: 20) {
                 VStack {
                     Text("\(game.moveCount)")
                         .font(.title2.bold())
@@ -75,6 +75,16 @@ struct GamePlayView: View {
                     Text("wrong")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+                if game.hintPenalty > 0 {
+                    VStack {
+                        Text("+\(game.hintPenalty)")
+                            .font(.title2.bold())
+                            .foregroundStyle(.orange)
+                        Text("hints")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 VStack {
                     Text("\(game.score)")

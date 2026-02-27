@@ -49,6 +49,9 @@ struct BoardView: View {
                     onDismiss: {
                         showQuestion = false
                         activeCell = nil
+                    },
+                    onHintUsed: { cost in
+                        game.useHint(cost: cost)
                     }
                 )
                 .transition(.scale.combined(with: .opacity))

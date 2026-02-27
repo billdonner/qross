@@ -34,6 +34,7 @@ final class GameState {
     var currentPosition: CellPosition?
     var wrongCount: Int = 0
     var moveCount: Int = 0
+    var hintPenalty: Int = 0
     var path: [CellPosition] = []
     var variant: GameVariant = .faceDown
     var selectedTopics: [Topic] = []
@@ -41,7 +42,7 @@ final class GameState {
     var cornerPair: CornerPair = .topLeftToBottomRight
 
     var score: Int {
-        moveCount + (wrongCount * 2)
+        moveCount + (wrongCount * 2) + hintPenalty
     }
 
     var minPossibleScore: Int {
@@ -79,6 +80,7 @@ final class GameState {
         currentPosition = nil
         wrongCount = 0
         moveCount = 0
+        hintPenalty = 0
         path = []
         phase = .playing
     }
@@ -165,12 +167,18 @@ final class GameState {
         }
     }
 
+    /// Apply a hint penalty to the score
+    func useHint(cost: Int) {
+        hintPenalty += cost
+    }
+
     func reset() {
         board = nil
         phase = .setup
         currentPosition = nil
         wrongCount = 0
         moveCount = 0
+        hintPenalty = 0
         path = []
     }
 
@@ -179,7 +187,8 @@ final class GameState {
     func shareText() -> String {
         guard let board else { return "" }
         let status = phase == .won ? "✅" : "❌"
-        var text = "Qross \(board.size)×\(board.size) \(board.cornerPair.arrow) — \(moveCount) moves, \(wrongCount) miss \(status)\n"
+        let hintStr = hintPenalty > 0 ? ", \(hintPenalty) hints" : ""
+        var text = "Qross \(board.size)×\(board.size) \(board.cornerPair.arrow) — \(moveCount) moves, \(wrongCount) miss\(hintStr) \(status)\n"
         for r in 0..<board.size {
             for c in 0..<board.size {
                 let cell = board.cells[r][c]

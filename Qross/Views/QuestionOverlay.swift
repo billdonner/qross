@@ -6,13 +6,30 @@ struct QuestionOverlay: View {
     let topicName: String
     let onAnswer: (Int) -> Void
     let onDismiss: () -> Void
+    let onHintUsed: (Int) -> Void  // cost passed back to GameState
 
     @State private var selectedIndex: Int?
     @State private var revealed = false
+    @State private var showHintText = false
+    @State private var eliminatedIndices: Set<Int> = []
+
+    /// Whether a hint-text hint is available (card has hint and not yet shown)
+    private var canShowHint: Bool {
+        challenge.hint != nil && !showHintText && !revealed
+    }
+
+    /// Whether we can eliminate a wrong choice (need 2+ wrong choices remaining)
+    private var canEliminate: Bool {
+        guard !revealed else { return false }
+        let wrongIndices = challenge.choices.indices.filter {
+            !challenge.choices[$0].isCorrect && !eliminatedIndices.contains($0)
+        }
+        return wrongIndices.count >= 2  // keep at least 1 wrong visible
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            // Topic badge
+            // Topic badge + difficulty
             HStack {
                 Text(topicName)
                     .font(.caption.bold())
@@ -32,46 +49,75 @@ struct QuestionOverlay: View {
             Text(challenge.question)
                 .font(.title3.bold())
                 .multilineTextAlignment(.center)
-                .padding(.bottom, 24)
+                .padding(.bottom, 20)
+
+            // Hint buttons (before answer)
+            if !revealed {
+                hintButtons
+                    .padding(.bottom, 16)
+            }
+
+            // Shown hint text
+            if showHintText, let hint = challenge.hint {
+                HStack(spacing: 6) {
+                    Image(systemName: "lightbulb.fill")
+                        .foregroundStyle(.yellow)
+                    Text(hint)
+                        .italic()
+                }
+                .font(.callout)
+                .padding(10)
+                .frame(maxWidth: .infinity)
+                .background(Color.yellow.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .padding(.bottom, 16)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
 
             // Choices
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 ForEach(Array(challenge.choices.enumerated()), id: \.offset) { index, choice in
-                    Button {
-                        guard !revealed else { return }
-                        selectedIndex = index
-                        revealed = true
-                        // Brief delay before sending answer
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            onAnswer(index)
-                        }
-                    } label: {
-                        HStack {
-                            Text(choiceLetter(index))
-                                .font(.callout.bold())
-                                .frame(width: 28, height: 28)
-                                .background(choiceLetterBG(index, choice: choice))
-                                .foregroundStyle(.white)
-                                .clipShape(Circle())
-
-                            Text(choice.text)
-                                .font(.body)
-                                .multilineTextAlignment(.leading)
-
-                            Spacer()
-
-                            if revealed && index == selectedIndex {
-                                Image(systemName: choice.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                    .foregroundStyle(choice.isCorrect ? .green : .red)
+                    if !eliminatedIndices.contains(index) {
+                        Button {
+                            guard !revealed else { return }
+                            selectedIndex = index
+                            revealed = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                onAnswer(index)
                             }
+                        } label: {
+                            HStack {
+                                Text(choiceLetter(index))
+                                    .font(.callout.bold())
+                                    .frame(width: 28, height: 28)
+                                    .background(choiceLetterBG(index, choice: choice))
+                                    .foregroundStyle(.white)
+                                    .clipShape(Circle())
+
+                                Text(choice.text)
+                                    .font(.body)
+                                    .multilineTextAlignment(.leading)
+
+                                Spacer()
+
+                                if revealed && index == selectedIndex {
+                                    Image(systemName: choice.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                        .foregroundStyle(choice.isCorrect ? .green : .red)
+                                }
+                            }
+                            .padding(12)
+                            .background(choiceBackground(index, choice: choice))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
-                        .padding(12)
-                        .background(choiceBackground(index, choice: choice))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .disabled(revealed)
+                        .transition(.asymmetric(
+                            insertion: .identity,
+                            removal: .move(edge: .trailing).combined(with: .opacity)
+                        ))
                     }
-                    .disabled(revealed)
                 }
             }
+            .animation(.spring(duration: 0.3), value: eliminatedIndices)
 
             // Explanation (after reveal)
             if revealed, let explanation = challenge.explanation {
@@ -81,17 +127,6 @@ struct QuestionOverlay: View {
                     .padding(.top, 16)
                     .transition(.opacity)
             }
-
-            // Hint
-            if !revealed, let hint = challenge.hint {
-                HStack {
-                    Image(systemName: "lightbulb")
-                    Text(hint)
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.top, 12)
-            }
         }
         .padding(24)
         .background(.ultraThinMaterial)
@@ -99,6 +134,55 @@ struct QuestionOverlay: View {
         .shadow(radius: 20)
         .padding(20)
     }
+
+    // MARK: - Hint Buttons
+
+    private var hintButtons: some View {
+        HStack(spacing: 12) {
+            if canShowHint {
+                Button {
+                    showHintText = true
+                    onHintUsed(1)
+                } label: {
+                    Label("Hint +1", systemImage: "lightbulb")
+                        .font(.caption.bold())
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(Color.yellow.opacity(0.15))
+                        .foregroundStyle(.orange)
+                        .clipShape(Capsule())
+                }
+            }
+
+            if canEliminate {
+                Button {
+                    eliminateOneWrong()
+                    onHintUsed(2)
+                } label: {
+                    Label("Eliminate +2", systemImage: "minus.circle")
+                        .font(.caption.bold())
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(Color.red.opacity(0.1))
+                        .foregroundStyle(.red)
+                        .clipShape(Capsule())
+                }
+            }
+        }
+    }
+
+    // MARK: - Eliminate
+
+    private func eliminateOneWrong() {
+        let wrongIndices = challenge.choices.indices.filter {
+            !challenge.choices[$0].isCorrect && !eliminatedIndices.contains($0)
+        }
+        if let victim = wrongIndices.randomElement() {
+            eliminatedIndices.insert(victim)
+        }
+    }
+
+    // MARK: - Helpers
 
     private var difficultyBadge: some View {
         Text(challenge.difficulty.rawValue.capitalized)
