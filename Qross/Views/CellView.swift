@@ -52,7 +52,7 @@ struct CellView: View {
             }
         }
         .disabled(cell.state != .available)
-        .aspectRatio(1, contentMode: .fit)
+        .aspectRatio(1, contentMode: .fill)
     }
 
     private var backgroundColor: Color {
