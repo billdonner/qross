@@ -123,6 +123,7 @@ struct BoardView: View {
                     variant: game.variant,
                     isStart: isStart,
                     isEnd: isEnd,
+                    isCornerPick: game.choosingCorner && isCorner && cell.state == .available,
                     onTap: {
                         activeCell = pos
                         showQuestion = true

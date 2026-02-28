@@ -6,6 +6,7 @@ struct CellView: View {
     let variant: GameVariant
     let isStart: Bool
     let isEnd: Bool
+    let isCornerPick: Bool // true when choosing corner and this is an available corner
     let onTap: () -> Void
 
     private var showColor: Bool {
@@ -19,8 +20,13 @@ struct CellView: View {
                     .fill(backgroundColor)
                     .shadow(color: shadowColor, radius: cell.state == .available ? 4 : 2)
 
-                // Start/end markers
-                if isStart && cell.state != .correct {
+                // Corner-pick pulsing indicator
+                if isCornerPick && cell.state == .available {
+                    CornerPulseIndicator()
+                }
+
+                // Start/end markers (after corner is chosen)
+                if isStart && !isCornerPick && cell.state != .correct {
                     Text("S")
                         .font(.caption2.bold())
                         .foregroundStyle(.white.opacity(0.8))
@@ -42,10 +48,12 @@ struct CellView: View {
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(.white.opacity(0.8))
                 case .available:
-                    Circle()
-                        .fill(.white.opacity(0.3))
-                        .frame(width: 8, height: 8)
-                        .pulseAnimation()
+                    if !isCornerPick {
+                        Circle()
+                            .fill(.white.opacity(0.3))
+                            .frame(width: 8, height: 8)
+                            .pulseAnimation()
+                    }
                 default:
                     EmptyView()
                 }
@@ -70,6 +78,36 @@ struct CellView: View {
 
     private var shadowColor: Color {
         cell.state == .available ? topicColor.opacity(0.5) : .clear
+    }
+}
+
+// MARK: - Corner pulse indicator (three concentric rings)
+
+struct CornerPulseIndicator: View {
+    @State private var animating = false
+
+    var body: some View {
+        ZStack {
+            // Outer ring — fades out as it expands
+            Circle()
+                .stroke(.white.opacity(animating ? 0.0 : 0.4), lineWidth: 2)
+                .frame(width: animating ? 28 : 14, height: animating ? 28 : 14)
+
+            // Inner ring — slightly delayed feel via different opacity range
+            Circle()
+                .stroke(.white.opacity(animating ? 0.15 : 0.6), lineWidth: 1.5)
+                .frame(width: animating ? 20 : 12, height: animating ? 20 : 12)
+
+            // Core dot
+            Circle()
+                .fill(.white.opacity(animating ? 0.5 : 0.9))
+                .frame(width: 10, height: 10)
+        }
+        .animation(
+            .easeInOut(duration: 1.0).repeatForever(autoreverses: true),
+            value: animating
+        )
+        .onAppear { animating = true }
     }
 }
 
