@@ -2,14 +2,46 @@
 
 A beautiful standalone iOS trivia game where players navigate a colored grid from corner to corner by answering questions correctly. Each cell holds a trivia question from a topic. Strategy meets knowledge.
 
-## Quick Start
+## Stack
+- SwiftUI, iOS 17+ (@Observable, no MVVM — views own state directly)
+- Swift 5.9, Xcode 16+
+- No SPM dependencies — pure Apple frameworks
+- Project generated with xcodegen from `project.yml`
+- Bundle ID: `com.qross.app`, Version: 0.2 (build 4)
 
-```bash
-cd ~/qross && xcodegen generate
-open Qross.xcodeproj
-# Or build from CLI:
-xcodebuild -scheme Qross -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' build
-```
+## Common Commands
+- `cd ~/qross && xcodegen generate` — regenerate Xcode project from project.yml
+- `xcodebuild -scheme Qross -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' build` — build
+- `xcodebuild -scheme QrossTests -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' test` — run tests (9 as of 2026-02-28)
+- `open Qross.xcodeproj` — open in Xcode
+
+## Cross-Project Sync
+After any API change in cardzerver that affects `/api/v1/trivia/gamedata` or `/api/v1/trivia/categories`:
+- Update `QrossAPI` response models in `Qross/Services/APIClient.swift`
+- Update `Challenge` model in `Qross/Models/Challenge.swift` if response shape changes
+- **Run `xcodegen generate` after adding or removing any Swift file**
+
+## Version Management
+
+Qross uses a simple versioning scheme — no client/server API version negotiation (the API is read-only trivia data).
+
+### Where versions live
+
+| What | File | Field |
+|------|------|-------|
+| Marketing version | `project.yml` | `MARKETING_VERSION` |
+| Build number | `project.yml` | `CURRENT_PROJECT_VERSION` |
+| Backup (main app) | `Qross/Info.plist` | `CFBundleShortVersionString`, `CFBundleVersion` |
+| Backup (clip) | `QrossClip/Info.plist` | `CFBundleShortVersionString`, `CFBundleVersion` |
+
+### When to bump
+
+| Change type | What to bump |
+|-------------|-------------|
+| Any TestFlight build | `CURRENT_PROJECT_VERSION` (+1) in project.yml, both Info.plists, then `xcodegen generate` |
+| App Store release | `MARKETING_VERSION` (semver) + reset build to 1 |
+
+**Keep all three files in sync** — project.yml is the source of truth but Info.plists must match for App Clip consistency.
 
 ## Architecture
 
@@ -22,6 +54,13 @@ xcodebuild -scheme Qross -destination 'platform=iOS Simulator,name=iPhone 17 Pro
 | Offline cache | Downloaded question packs per topic | Local JSON cache |
 
 **cardzerver is the question warehouse, not the game server.** App fetches questions at game start (or from cache), then all game logic runs locally.
+
+- `GameState` is `@Observable` — single source of truth for board, phase, score, path
+- `QrossAPI` is a static struct (stateless HTTP calls), not an actor
+- `QuestionCache` is an actor (thread-safe disk I/O for offline question storage)
+- `GameCenterManager` is `@Observable` — drives leaderboard UI based on auth state
+- `TopicPalette.assign()` dynamically assigns colors at game start — colors are not persisted or sent over the wire
+- `Board` is a value type (struct) — immutable after generation, mutated via copy-on-write in GameState
 
 ## API Dependency
 
@@ -152,9 +191,12 @@ Launch
 qross/
 ├── project.yml              # xcodegen spec
 ├── CLAUDE.md                # This file
+├── README.md                # Public-facing project intro
 ├── Docs/
 │   ├── game-design.md       # Full game design document
-│   └── user-manual.md       # Player-facing user manual
+│   ├── user-manual.md       # Player-facing user manual
+│   ├── appstore-copy.md     # App Store Connect metadata
+│   └── testflight-notes-build4.md  # Latest TestFlight release notes
 ├── Qross/                   # Main app target
 │   ├── App/
 │   │   └── QrossApp.swift        # @main, RootView with onboarding gate
@@ -215,6 +257,14 @@ qross/
 cd ~/qross && xcodegen generate
 swift build -c release  # if CLI tools added later
 ```
+
+## Known Issues & Fixes
+- App Clip store link is placeholder (`id0000000000`) — replace with real App Store ID after first approval
+- Daily challenge seed is `nil` (TODO in GameState.swift:65) — date-based seed generation not yet implemented
+- StatsView is a placeholder — game history persistence not yet built
+- Concentration variant enum exists but is hidden from UI picker — gameplay logic for pair-matching not implemented
+- `fetchQuestions(categories:)` filters client-side after fetching all gamedata — no server-side category filtering yet
+- Difficulty is not parsed from the API — all questions are treated as `.medium`
 
 ## Ports
 
