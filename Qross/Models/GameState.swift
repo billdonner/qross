@@ -9,6 +9,13 @@ enum GamePhase {
     case lostStuck    // no available moves
 }
 
+enum GameMode: String, CaseIterable, Identifiable {
+    case single = "Single"
+    case doubleCross = "Double Cross"
+
+    var id: String { rawValue }
+}
+
 enum GameVariant: String, CaseIterable, Identifiable {
     case faceUp = "Face Up"
     case faceDown = "Face Down"
@@ -37,16 +44,20 @@ final class GameState {
     var hintPenalty: Int = 0
     var path: [CellPosition] = []
     var variant: GameVariant = .faceDown
+    var mode: GameMode = .single
     var selectedTopics: [Topic] = []
     var boardSize: Int = 5
     var cornerPair: CornerPair = .topLeftToBottomRight
+    var leg: Int = 1
+    var choosingSecondCorner: Bool = false
 
     var score: Int {
         moveCount + (wrongCount * 2) + hintPenalty
     }
 
     var minPossibleScore: Int {
-        board?.size ?? boardSize  // diagonal = N moves
+        let n = board?.size ?? boardSize  // diagonal = N moves
+        return mode == .doubleCross ? n * 2 : n
     }
 
     var livesRemaining: Int {
@@ -82,6 +93,8 @@ final class GameState {
         moveCount = 0
         hintPenalty = 0
         path = []
+        leg = 1
+        choosingSecondCorner = false
         phase = .playing
     }
 
@@ -89,6 +102,18 @@ final class GameState {
 
     func availableCells() -> [CellPosition] {
         guard let board else { return [] }
+
+        // Double Cross: choosing second leg target — only remaining corners
+        if choosingSecondCorner {
+            let remaining = Board.remainingCorners(
+                start: board.startPosition, end: board.endPosition, gridSize: board.size
+            )
+            return remaining.filter { corner in
+                let state = board[corner].state
+                return state == .available || state == .untouched
+            }
+        }
+
         guard let pos = currentPosition else {
             // No move yet — all untried corners are available
             return board.corners.filter { corner in
@@ -121,11 +146,20 @@ final class GameState {
         self.board = board
     }
 
+    /// Select a corner as the leg 2 target (no question — just a pick)
+    func selectSecondCorner(at position: CellPosition) {
+        guard var board, phase == .playing, choosingSecondCorner else { return }
+        board.endPosition = position
+        choosingSecondCorner = false
+        self.board = board
+        updateAvailability()
+    }
+
     func answerCell(at position: CellPosition, choiceIndex: Int) {
         guard var board, phase == .playing else { return }
         let cell = board[position]
         let isCorrect = choiceIndex == cell.challenge.correctIndex
-        let isCornerPick = currentPosition == nil  // choosing starting corner
+        let isCornerPick = currentPosition == nil
 
         if isCorrect {
             board[position].state = .correct
@@ -140,11 +174,30 @@ final class GameState {
                 board.cornerPair = Board.cornerPair(for: position, gridSize: board.size)
             }
 
-            // Check win
+            // Check win / leg transition
             if position == board.endPosition {
-                self.board = board
-                phase = .won
-                return
+                if mode == .doubleCross && leg == 1 {
+                    // Leg 1 complete — transition to leg 2
+                    leg = 2
+                    choosingSecondCorner = true
+                    // Mark remaining corners as available for picking
+                    let remaining = Board.remainingCorners(
+                        start: board.startPosition, end: position, gridSize: board.size
+                    )
+                    for corner in remaining {
+                        if board[corner].state == .untouched {
+                            board[corner].state = .available
+                        }
+                    }
+                    self.board = board
+                    updateAvailability()
+                    return
+                } else {
+                    // Single mode win, or Double Cross leg 2 win
+                    self.board = board
+                    phase = .won
+                    return
+                }
             }
         } else {
             board[position].state = .wrong
@@ -180,6 +233,8 @@ final class GameState {
         moveCount = 0
         hintPenalty = 0
         path = []
+        leg = 1
+        choosingSecondCorner = false
     }
 
     // MARK: - Share Card
@@ -188,7 +243,8 @@ final class GameState {
         guard let board else { return "" }
         let status = phase == .won ? "✅" : "❌"
         let hintStr = hintPenalty > 0 ? ", \(hintPenalty) hints" : ""
-        var text = "Qross \(board.size)×\(board.size) \(board.cornerPair.arrow) — \(moveCount) moves, \(wrongCount) miss\(hintStr) \(status)\n"
+        let modeLabel = mode == .doubleCross ? " Double Cross" : ""
+        var text = "Qross\(modeLabel) \(board.size)×\(board.size) \(board.cornerPair.arrow) — \(moveCount) moves, \(wrongCount) miss\(hintStr) \(status)\n"
         for r in 0..<board.size {
             for c in 0..<board.size {
                 let cell = board.cells[r][c]

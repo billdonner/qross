@@ -66,6 +66,19 @@ struct HomeView: View {
                             .pickerStyle(.segmented)
                         }
 
+                        // Mode picker
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Mode")
+                                .font(.caption.bold())
+                                .foregroundStyle(.secondary)
+                            Picker("Mode", selection: $game.mode) {
+                                ForEach(GameMode.allCases) { m in
+                                    Text(m.rawValue).tag(m)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
+
                         // Topic selection
                         if !availableTopics.isEmpty {
                             topicPicker

@@ -196,6 +196,32 @@ Lower is better. The theoretical minimum on a 5×5 is 5 (perfect diagonal, no wr
 | Good | Minimum + 3-5 |
 | Completed | Finished but above Good |
 
+## Game Modes
+
+Game mode controls the **win condition structure** — how many legs must be completed to win. This is separate from the variant (which controls board visibility).
+
+### Single (Default)
+Standard one-diagonal game. Navigate from your starting corner to the opposite corner. This is the classic Qross experience.
+
+### Double Cross
+Two-leg game. After completing the first diagonal, the player must continue to one of the two remaining corners:
+
+1. Player picks a starting corner and navigates to the opposite corner (Leg 1)
+2. Upon reaching the opposite corner, the two remaining corners pulse
+3. Player taps one of the remaining corners to set it as the new goal
+4. Player navigates from the Leg 1 endpoint to the chosen corner (Leg 2)
+5. Answering the final corner correctly wins the game
+
+**Key rules for Double Cross:**
+- Board state fully carries over between legs (correct cells traversable, burned cells stay blocked)
+- Wrong answer count and score accumulate across both legs
+- No extra lives between legs — this makes Double Cross genuinely harder
+- Score formula is unchanged: `moves + (wrong × 2) + hintPenalty` across both legs
+- Minimum possible score is `2 × board_size` (two diagonals)
+
+**Second corner pick phase:**
+Between legs, only the two remaining corners are available (regardless of adjacency). This is a special "pick your target" phase — the player selects which corner to aim for, then must navigate there normally via adjacency.
+
 ## Game Variants
 
 ### Face Up

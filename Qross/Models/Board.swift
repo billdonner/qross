@@ -98,6 +98,18 @@ struct Board: Codable {
         return CellPosition(row: last - pos.row, col: last - pos.col)
     }
 
+    /// Returns the two corners not used in leg 1 (for Double Cross mode)
+    static func remainingCorners(start: CellPosition, end: CellPosition, gridSize: Int) -> [CellPosition] {
+        let last = gridSize - 1
+        let allCorners = [
+            CellPosition(row: 0, col: 0),
+            CellPosition(row: 0, col: last),
+            CellPosition(row: last, col: 0),
+            CellPosition(row: last, col: last),
+        ]
+        return allCorners.filter { $0 != start && $0 != end }
+    }
+
     /// Given a corner, return the matching CornerPair
     static func cornerPair(for start: CellPosition, gridSize: Int) -> CornerPair {
         let last = gridSize - 1

@@ -50,8 +50,19 @@ struct GamePlayView: View {
             HStack(spacing: 12) {
                 Text(won ? "🎉" : "💥")
                     .font(.system(size: 40))
-                Text(won ? "You Won!" : "Game Over")
-                    .font(.title.bold())
+                VStack(spacing: 4) {
+                    Text(won ? "You Won!" : "Game Over")
+                        .font(.title.bold())
+                    if game.mode == .doubleCross {
+                        Text("Double Cross")
+                            .font(.caption.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.purple.opacity(0.2))
+                            .foregroundStyle(.purple)
+                            .clipShape(Capsule())
+                    }
+                }
             }
 
             if let reason {

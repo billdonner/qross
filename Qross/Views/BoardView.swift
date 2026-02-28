@@ -73,13 +73,28 @@ struct BoardView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text("Qross")
-                    .font(.title2.bold())
+                HStack(spacing: 6) {
+                    Text("Qross")
+                        .font(.title2.bold())
+                    if game.mode == .doubleCross {
+                        Text("Leg \(game.leg) of 2")
+                            .font(.caption.bold())
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.purple.opacity(0.2))
+                            .foregroundStyle(.purple)
+                            .clipShape(Capsule())
+                    }
+                }
                 if let board = game.board {
                     if game.choosingCorner {
                         Text("\(board.size)×\(board.size) — Pick a corner!")
                             .font(.caption)
                             .foregroundStyle(.orange)
+                    } else if game.choosingSecondCorner {
+                        Text("\(board.size)×\(board.size) — Pick your next target!")
+                            .font(.caption)
+                            .foregroundStyle(.purple)
                     } else {
                         Text("\(board.size)×\(board.size) \(board.cornerPair.arrow)")
                             .font(.caption)
@@ -115,16 +130,31 @@ struct BoardView: View {
                 let pos = CellPosition(row: row, col: col)
                 let cell = board[pos]
                 let isCorner = board.corners.contains(pos)
-                let isEnd = game.choosingCorner ? false : pos == board.endPosition
+                let isSecondCornerCandidate: Bool = {
+                    guard game.choosingSecondCorner else { return false }
+                    let remaining = Board.remainingCorners(
+                        start: board.startPosition, end: board.endPosition, gridSize: board.size
+                    )
+                    return remaining.contains(pos) && (cell.state == .available || cell.state == .untouched)
+                }()
+                let isEnd: Bool = {
+                    if game.choosingCorner || game.choosingSecondCorner { return false }
+                    return pos == board.endPosition
+                }()
                 CellView(
                     cell: cell,
                     topicColor: topicColors[cell.topicColor] ?? .blue,
                     variant: game.variant,
                     isEnd: isEnd,
-                    isCornerPick: game.choosingCorner && isCorner && cell.state == .available,
+                    isCornerPick: (game.choosingCorner && isCorner && cell.state == .available) || isSecondCornerCandidate,
                     onTap: {
-                        activeCell = pos
-                        showQuestion = true
+                        if isSecondCornerCandidate {
+                            // Second corner pick is just a selection — no question
+                            game.selectSecondCorner(at: pos)
+                        } else {
+                            activeCell = pos
+                            showQuestion = true
+                        }
                     }
                 )
             }

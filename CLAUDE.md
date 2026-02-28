@@ -123,6 +123,21 @@ Two hint types are available during the question overlay:
 | 7×7 | 5 |
 | 8×8 | 6 |
 
+## Game Modes
+
+Mode controls the **win condition structure** (how many legs to complete). Separate from variant (which controls visibility).
+
+| Mode | Description |
+|------|-------------|
+| **Single** | One diagonal — navigate from start corner to opposite corner (default) |
+| **Double Cross** | Two legs — complete the first diagonal, then continue to one of the two remaining corners. Board state carries over (correct cells traversable, burned cells stay blocked, lives accumulate). Min score = `2 × board_size` |
+
+### Double Cross Flow
+1. Pick a corner → navigate to opposite corner (Leg 1)
+2. Two remaining corners pulse → pick your next target
+3. Navigate from Leg 1 endpoint to chosen corner (Leg 2)
+4. Answer the final corner correctly → Win
+
 ## Game Variants
 
 | Variant | Description |
