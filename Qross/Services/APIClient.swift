@@ -10,7 +10,7 @@ struct QrossAPI {
 
     /// Fetch trivia categories with question counts
     static func fetchCategories() async throws -> [Topic] {
-        let url = URL(string: "\(baseURL)/api/v1/trivia/categories")!
+        let url = URL(string: "\(baseURL)/api/v1/trivia/categories?tier=free")!
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw APIError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
@@ -23,7 +23,7 @@ struct QrossAPI {
 
     /// Fetch trivia questions for specific categories
     static func fetchQuestions(categories: [String]? = nil) async throws -> [Challenge] {
-        let url = URL(string: "\(baseURL)/api/v1/trivia/gamedata")!
+        let url = URL(string: "\(baseURL)/api/v1/trivia/gamedata?tier=free")!
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw APIError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
