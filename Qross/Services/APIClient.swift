@@ -4,7 +4,7 @@ enum APIError: Error {
     case badURL, networkError(Error), decodingError(Error), serverError(Int)
 }
 
-/// Minimal card-engine API client for fetching trivia questions
+/// Minimal cardzerver API client for fetching trivia questions
 struct QrossAPI {
     static let baseURL = "https://bd-cardzerver.fly.dev"
 
@@ -45,7 +45,7 @@ struct QrossAPI {
                 correctIndex: correctIndex,
                 difficulty: .medium,
                 topicId: item.topic,
-                hint: nil,
+                hint: item.hint,
                 explanation: item.explanation
             )
         }
@@ -73,5 +73,6 @@ private struct GameDataResponse: Decodable {
         let answers: [String]
         let correct: String
         let explanation: String?
+        let hint: String?
     }
 }

@@ -4,7 +4,6 @@ struct CellView: View {
     let cell: Cell
     let topicColor: Color
     let variant: GameVariant
-    let isStart: Bool
     let isEnd: Bool
     let isCornerPick: Bool // true when choosing corner and this is an available corner
     let onTap: () -> Void
@@ -25,15 +24,10 @@ struct CellView: View {
                     CornerPulseIndicator()
                 }
 
-                // Start/end markers (after corner is chosen)
-                if isStart && !isCornerPick && cell.state != .correct {
-                    Text("S")
-                        .font(.caption2.bold())
-                        .foregroundStyle(.white.opacity(0.8))
-                }
+                // Goal marker — small star on the destination corner
                 if isEnd && cell.state != .correct {
-                    Text("E")
-                        .font(.caption2.bold())
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 10))
                         .foregroundStyle(.white.opacity(0.8))
                 }
 

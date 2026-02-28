@@ -7,8 +7,7 @@ final class GameCenterManager {
 
     func authenticate() {
         GKLocalPlayer.local.authenticateHandler = { [weak self] viewController, error in
-            if let error {
-                print("Game Center auth error: \(error.localizedDescription)")
+            if error != nil {
                 return
             }
             if viewController != nil {
@@ -34,7 +33,7 @@ final class GameCenterManager {
                 leaderboardIDs: [leaderboardID]
             )
         } catch {
-            print("Failed to submit score: \(error)")
+            // Score submission failed silently — not critical
         }
     }
 

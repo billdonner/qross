@@ -115,13 +115,11 @@ struct BoardView: View {
                 let pos = CellPosition(row: row, col: col)
                 let cell = board[pos]
                 let isCorner = board.corners.contains(pos)
-                let isStart = game.choosingCorner ? (isCorner && cell.state == .available) : pos == board.startPosition
                 let isEnd = game.choosingCorner ? false : pos == board.endPosition
                 CellView(
                     cell: cell,
                     topicColor: topicColors[cell.topicColor] ?? .blue,
                     variant: game.variant,
-                    isStart: isStart,
                     isEnd: isEnd,
                     isCornerPick: game.choosingCorner && isCorner && cell.state == .available,
                     onTap: {
