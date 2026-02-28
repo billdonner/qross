@@ -15,13 +15,13 @@ xcodebuild -scheme Qross -destination 'platform=iOS Simulator,name=iPhone 17 Pro
 
 | Layer | What | Where |
 |-------|------|-------|
-| Question pool | Trivia decks (20+ categories, 9k+ questions) | card-engine API on Fly |
+| Question pool | Trivia decks (20+ categories, 9k+ questions) | cardzerver API on Fly |
 | Game logic | Board gen, adjacency, scoring, win/lose | On-device (Swift) |
-| Game state | Current board, moves, score | On-device (SwiftData) |
+| Game state | Current board, moves, score | On-device (@Observable) |
 | Leaderboards | Compare with friends, daily challenge | Game Center |
 | Offline cache | Downloaded question packs per topic | Local JSON cache |
 
-**card-engine is the question warehouse, not the game server.** App fetches questions at game start (or from cache), then all game logic runs locally.
+**cardzerver is the question warehouse, not the game server.** App fetches questions at game start (or from cache), then all game logic runs locally.
 
 ## API Dependency
 
@@ -30,14 +30,14 @@ xcodebuild -scheme Qross -destination 'platform=iOS Simulator,name=iPhone 17 Pro
 | `GET /api/v1/trivia/gamedata` | Bulk trivia fetch (all categories) |
 | `GET /api/v1/trivia/categories` | Category list with counts |
 
-Base URL: `https://bd-card-engine.fly.dev`
+Base URL: `https://bd-cardzerver.fly.dev`
 
 ## Targets
 
 | Target | Type | Bundle ID |
 |--------|------|-----------|
-| Qross | iOS App | `com.billdonner.qross` |
-| QrossClip | App Clip | `com.billdonner.qross.Clip` |
+| Qross | iOS App | `com.qross.app` |
+| QrossClip | App Clip | `com.qross.app.Clip` |
 
 ## Game Rules
 
@@ -91,7 +91,7 @@ Two hint types are available during the question overlay:
 | **Face Up** | All questions visible — pure strategy mode |
 | **Face Down** | Only topic colors shown — questions revealed on tap |
 | **Blind** | No colors, no questions — full fog of war |
-| **Concentration** | Even-sized boards only (4×4, 6×6, 8×8). Questions duplicated in two random cells, must match both before answering. Both cells marked correct/incorrect together |
+| **Concentration** | *(Planned, not yet in UI)* Even-sized boards only (4×4, 6×6, 8×8). Questions duplicated in two random cells, must match both before answering. Both cells marked correct/incorrect together |
 
 ## Difficulty Knobs
 
@@ -104,9 +104,9 @@ Two hint types are available during the question overlay:
 | Topics | Player picks all | Game forces some |
 | Timer | None | 15 seconds |
 
-## Daily Challenge
+## Daily Challenge *(Planned)*
 
-Same seeded board for all players each day (same topics, questions, layout). Leaderboard via Game Center. Shareable results grid:
+Same seeded board for all players each day (same topics, questions, layout). Leaderboard via Game Center. Shareable results grid. Seed generation is not yet implemented — infrastructure exists (SeededRNG, CornerPair, share text) but the date-based seed is a TODO.
 
 ```
 Qross Daily 5×5 — 7 moves, 1 miss
@@ -141,8 +141,9 @@ Launch
             │    │    ├─ Hint: Show Hint (+1) / Eliminate (+2)
             │    ├─ Win → score card + share
             │    └─ Lose → reason + score card
-            ├─ Leaderboards (Game Center, if authenticated)
-            └─ Stats (StatsView)
+            ├─ How to Play (HowToPlayView, sheet)
+            ├─ About (AboutView, sheet)
+            └─ Leaderboards (Game Center, if authenticated)
 ```
 
 ## Project Structure
@@ -170,9 +171,11 @@ qross/
 │   │   ├── BoardView.swift        # The main game grid
 │   │   ├── CellView.swift         # Individual cell rendering
 │   │   ├── QuestionOverlay.swift  # Question popup with hints
-│   │   └── StatsView.swift        # Game statistics
+│   │   ├── StatsView.swift         # Game statistics (placeholder)
+│   │   ├── HowToPlayView.swift    # Rules & strategy guide
+│   │   └── AboutView.swift        # About screen with feature list
 │   ├── Services/
-│   │   ├── APIClient.swift        # card-engine API
+│   │   ├── APIClient.swift        # cardzerver API
 │   │   ├── QuestionCache.swift    # Offline question storage
 │   │   └── GameCenterManager.swift
 │   ├── Assets.xcassets/
@@ -203,7 +206,7 @@ qross/
 | Repo | Path | Purpose |
 |------|------|---------|
 | **qross** | `~/qross` | This repo — iOS game |
-| **card-engine** | `~/card-engine` | Trivia question API backend |
+| **cardzerver** | `~/cardzerver` | Trivia question API backend |
 | **obo** | `~/obo` | Hub docs (game design originated here) |
 
 ## Build & Install
@@ -215,4 +218,4 @@ swift build -c release  # if CLI tools added later
 
 ## Ports
 
-No local server needed — connects to card-engine on Fly.io.
+No local server needed — connects to cardzerver on Fly.io.
