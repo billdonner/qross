@@ -273,6 +273,41 @@ final class GameStateTests: XCTestCase {
         XCTAssertFalse(game.choosingSecondCorner)
     }
 
+    func testMissGoalCornerInstantLoss() {
+        let game = GameState()
+        game.selectedTopics = [Topic(id: "test", name: "Test", questionCount: 100)]
+        game.boardSize = 4
+        game.mode = .doubleCross
+        game.startGame(questions: makeQuestions(count: 20))
+
+        // Leg 1: navigate to one cell before the goal
+        game.answerCell(at: CellPosition(row: 0, col: 0), choiceIndex: 1)
+        game.answerCell(at: CellPosition(row: 1, col: 1), choiceIndex: 1)
+        game.answerCell(at: CellPosition(row: 2, col: 2), choiceIndex: 1)
+
+        // Miss the goal corner (3,3) — should lose immediately
+        game.answerCell(at: CellPosition(row: 3, col: 3), choiceIndex: 0)
+
+        XCTAssertEqual(game.phase, .lostStuck, "Missing the goal corner should be instant loss")
+    }
+
+    func testMissGoalCornerSingleMode() {
+        let game = GameState()
+        game.selectedTopics = [Topic(id: "test", name: "Test", questionCount: 100)]
+        game.boardSize = 4
+        game.mode = .single
+        game.startGame(questions: makeQuestions(count: 20))
+
+        game.answerCell(at: CellPosition(row: 0, col: 0), choiceIndex: 1)
+        game.answerCell(at: CellPosition(row: 1, col: 1), choiceIndex: 1)
+        game.answerCell(at: CellPosition(row: 2, col: 2), choiceIndex: 1)
+
+        // Miss the goal corner — instant loss in single mode too
+        game.answerCell(at: CellPosition(row: 3, col: 3), choiceIndex: 0)
+
+        XCTAssertEqual(game.phase, .lostStuck, "Missing the goal corner should be instant loss")
+    }
+
     func testDoubleCrossResetClearsState() {
         let game = GameState()
         game.mode = .doubleCross

@@ -203,6 +203,13 @@ final class GameState {
             board[position].state = .wrong
             wrongCount += 1
 
+            // Check lose — missed the goal corner (burned, can never win)
+            if !isCornerPick && position == board.endPosition {
+                self.board = board
+                phase = .lostStuck
+                return
+            }
+
             // Check lose — too many wrong
             if wrongCount >= board.maxWrong {
                 self.board = board
