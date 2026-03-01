@@ -124,11 +124,11 @@ struct Board: Codable {
     /// Max wrong answers allowed for this board size
     var maxWrong: Int {
         switch size {
-        case 4: return 2
-        case 5: return 3
-        case 6: return 4
-        case 7: return 5
-        default: return 6
+        case 4: return 4
+        case 5: return 10
+        case 6: return 10
+        case 7: return 10
+        default: return 10
         }
     }
 

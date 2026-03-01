@@ -44,12 +44,12 @@ final class BoardTests: XCTestCase {
         }
 
         let b4 = Board.generate(size: 4, cornerPair: .topLeftToBottomRight, topics: topics, questions: questions)
-        XCTAssertEqual(b4.maxWrong, 2)
+        XCTAssertEqual(b4.maxWrong, 4)
 
         let b5 = Board.generate(size: 5, cornerPair: .topLeftToBottomRight, topics: topics, questions: questions)
-        XCTAssertEqual(b5.maxWrong, 3)
+        XCTAssertEqual(b5.maxWrong, 10)
 
         let b8 = Board.generate(size: 8, cornerPair: .topLeftToBottomRight, topics: topics, questions: questions)
-        XCTAssertEqual(b8.maxWrong, 6)
+        XCTAssertEqual(b8.maxWrong, 10)
     }
 }

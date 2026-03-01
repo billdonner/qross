@@ -117,11 +117,11 @@ Two hint types are available during the question overlay:
 ### Wrong Answer Tolerance by Board Size
 | Board | Max Wrong |
 |-------|-----------|
-| 4×4 | 2 |
-| 5×5 | 3 |
-| 6×6 | 4 |
-| 7×7 | 5 |
-| 8×8 | 6 |
+| 4×4 | 4 |
+| 5×5 | 10 |
+| 6×6 | 10 |
+| 7×7 | 10 |
+| 8×8 | 10 |
 
 ## Game Modes
 

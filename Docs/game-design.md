@@ -66,11 +66,11 @@ The UI picker offers sizes 4 through 8:
 
 | Size | Cells | Min Path | Max Wrong | Recommended Topics |
 |------|-------|----------|-----------|--------------------|
-| 4×4 | 16 | 4 | 2 | 2-4 |
-| 5×5 | 25 | 5 | 3 | 3-5 |
-| 6×6 | 36 | 6 | 4 | 3-6 |
-| 7×7 | 49 | 7 | 5 | 4-7 |
-| 8×8 | 64 | 8 | 6 | 5-8 |
+| 4×4 | 16 | 4 | 4 | 2-4 |
+| 5×5 | 25 | 5 | 10 | 3-5 |
+| 6×6 | 36 | 6 | 10 | 3-6 |
+| 7×7 | 49 | 7 | 10 | 4-7 |
+| 8×8 | 64 | 8 | 10 | 5-8 |
 
 Min Path = minimum moves with 8-connectivity (the diagonal).
 
