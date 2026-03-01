@@ -92,19 +92,19 @@ struct QuestionOverlay: View {
                             selectedIndex = index
                             revealed = true
                             let correct = challenge.choices[index].isCorrect
-                            if correct {
-                                // Correct: always auto-dismiss at 0.8s
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                    onAnswer(index)
-                                }
-                            } else if fastGame {
-                                // Fast Game ON + wrong: auto-dismiss after 2s
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            if fastGame {
+                                // Fast Game ON: auto-dismiss quickly
+                                let delay = correct ? 0.8 : 2.0
+                                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                                     onAnswer(index)
                                 }
                             } else {
-                                // Fast Game OFF + wrong: wait for Continue button
+                                // Fast Game OFF: show OK button, auto-dismiss after 10s
                                 waitingForContinue = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+                                    guard waitingForContinue else { return }
+                                    onAnswer(index)
+                                }
                             }
                         } label: {
                             HStack {
@@ -160,18 +160,19 @@ struct QuestionOverlay: View {
                     .transition(.opacity)
             }
 
-            // Continue button (Fast Game OFF + wrong answer)
+            // OK button (Fast Game OFF — dismiss after reviewing answer)
             if waitingForContinue {
                 Button {
+                    waitingForContinue = false
                     if let idx = selectedIndex {
                         onAnswer(idx)
                     }
                 } label: {
-                    Text("Continue")
+                    Text("OK")
                         .font(.callout.bold())
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(Color.blue)
+                        .background(isCorrectAnswer ? Color.green : Color.blue)
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }

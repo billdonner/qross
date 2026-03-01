@@ -11,7 +11,16 @@ struct CellView: View {
     let onTap: () -> Void
 
     private var showColor: Bool {
-        variant != .blind || cell.state == .correct || cell.state == .wrong
+        switch variant {
+        case .faceUp:
+            return true  // all cells show topic colors
+        case .faceDown:
+            // only revealed cells (correct, wrong, available) show color; untouched are hidden
+            return cell.state != .untouched
+        case .blind, .concentration:
+            // only answered cells show color
+            return cell.state == .correct || cell.state == .wrong
+        }
     }
 
     var body: some View {

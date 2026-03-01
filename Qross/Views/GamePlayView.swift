@@ -18,17 +18,19 @@ struct GamePlayView: View {
             Color(.systemBackground).ignoresSafeArea()
 
             if game.board != nil {
-                // Board always visible once game starts
+                // Board always visible once game starts — dimmed when game over
                 BoardView(game: game, topicColors: topicColors, onQuit: gameOver ? nil : onExit)
+                    .opacity(gameOver ? 0.3 : 1.0)
+                    .allowsHitTesting(!gameOver)
 
-                // Result overlay when game ends
+                // Result overlay when game ends — compact, pinned to top
                 if gameOver {
-                    Color.black.opacity(0.5)
-                        .ignoresSafeArea()
-                        .transition(.opacity)
-
-                    resultOverlay
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    VStack {
+                        resultOverlay
+                            .padding(.top, 60)
+                        Spacer()
+                    }
+                    .transition(.move(edge: .top).combined(with: .opacity))
                 }
             } else {
                 ProgressView()
@@ -45,82 +47,71 @@ struct GamePlayView: View {
         default: nil
         }
 
-        return VStack(spacing: 16) {
-            // Result header
-            HStack(spacing: 12) {
-                Text(won ? "🎉" : "💥")
-                    .font(.system(size: 40))
-                VStack(spacing: 4) {
-                    Text(won ? "You Won!" : "Game Over")
-                        .font(.title.bold())
-                    if game.mode == .doubleCross {
-                        Text("Double Cross")
-                            .font(.caption.bold())
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(Color.purple.opacity(0.2))
-                            .foregroundStyle(.purple)
-                            .clipShape(Capsule())
+        return VStack(spacing: 10) {
+            // Top row: result title + score stats
+            HStack {
+                // Left: title + reason
+                HStack(spacing: 8) {
+                    Text(won ? "🎉" : "💥")
+                        .font(.system(size: 28))
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 6) {
+                            Text(won ? "You Won!" : "Game Over")
+                                .font(.title3.bold())
+                            if game.mode == .doubleCross {
+                                Text("Double Cross")
+                                    .font(.caption2.bold())
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 1)
+                                    .background(Color.purple.opacity(0.2))
+                                    .foregroundStyle(.purple)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        if let reason {
+                            Text(reason)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
-            }
 
-            if let reason {
-                Text(reason)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+                Spacer()
 
-            // Score card
-            HStack(spacing: 20) {
-                VStack {
-                    Text("\(game.moveCount)")
-                        .font(.title2.bold())
-                    Text("moves")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                VStack {
-                    Text("\(game.wrongCount)")
-                        .font(.title2.bold())
-                    Text("wrong")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                if game.hintPenalty > 0 {
-                    VStack {
-                        Text("+\(game.hintPenalty)")
-                            .font(.title2.bold())
-                            .foregroundStyle(.orange)
-                        Text("hints")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                VStack {
+                // Right: score
+                VStack(spacing: 2) {
                     Text("\(game.score)")
                         .font(.title2.bold())
                         .foregroundStyle(won ? .green : .red)
                     Text("score")
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
             }
 
-            if won {
-                Text("Best possible: \(game.minPossibleScore)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            // Stats row
+            HStack(spacing: 0) {
+                statItem(value: "\(game.moveCount)", label: "moves")
+                Spacer()
+                statItem(value: "\(game.wrongCount)", label: "wrong")
+                if game.hintPenalty > 0 {
+                    Spacer()
+                    statItem(value: "+\(game.hintPenalty)", label: "hints", color: .orange)
+                }
+                if won {
+                    Spacer()
+                    statItem(value: "\(game.minPossibleScore)", label: "best", color: .secondary)
+                }
             }
 
             // Actions
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 if won {
                     let shareText = game.shareText()
                     ShareLink(item: shareText) {
                         Label("Share", systemImage: "square.and.arrow.up")
                             .font(.callout.bold())
-                            .padding(.horizontal, 20)
+                            .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
                             .background(.ultraThinMaterial)
                             .clipShape(Capsule())
@@ -132,7 +123,7 @@ struct GamePlayView: View {
                 } label: {
                     Text("Done")
                         .font(.callout.bold())
-                        .padding(.horizontal, 24)
+                        .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
                         .background(won ? Color.green : Color.blue)
                         .foregroundStyle(.white)
@@ -140,10 +131,22 @@ struct GamePlayView: View {
                 }
             }
         }
-        .padding(24)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
         .background(.ultraThickMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(radius: 20)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 12)
+    }
+
+    private func statItem(value: String, label: String, color: Color = .primary) -> some View {
+        VStack(spacing: 1) {
+            Text(value)
+                .font(.callout.bold())
+                .foregroundStyle(color)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
     }
 }

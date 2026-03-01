@@ -37,8 +37,8 @@ struct BoardView: View {
 
             // Lives
             livesBar
-                .padding(.horizontal)
-                .padding(.bottom, 8)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
         }
         .overlay {
             if showQuestion, let pos = activeCell, let board = game.board {
@@ -182,40 +182,47 @@ struct BoardView: View {
     // MARK: - Lives Bar
 
     private var livesBar: some View {
-        HStack {
-            // Lives
-            HStack(spacing: 4) {
-                ForEach(0..<(game.board?.maxWrong ?? 3), id: \.self) { i in
-                    Image(systemName: i < game.livesRemaining ? "heart.fill" : "heart")
-                        .foregroundStyle(i < game.livesRemaining ? .red : .gray)
-                        .font(.caption)
+        VStack(spacing: 10) {
+            // Lives + Quit
+            HStack {
+                HStack(spacing: 6) {
+                    ForEach(0..<(game.board?.maxWrong ?? 3), id: \.self) { i in
+                        Image(systemName: i < game.livesRemaining ? "heart.fill" : "heart")
+                            .foregroundStyle(i < game.livesRemaining ? .red : .gray.opacity(0.5))
+                            .font(.body)
+                    }
+                }
+
+                Spacer()
+
+                if onQuit != nil {
+                    Button {
+                        showQuitConfirm = true
+                    } label: {
+                        Text("Quit")
+                            .font(.callout.bold())
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 6)
+                            .background(Color.red.opacity(0.12))
+                            .foregroundStyle(.red)
+                            .clipShape(Capsule())
+                    }
                 }
             }
-
-            if onQuit != nil {
-                Button {
-                    showQuitConfirm = true
-                } label: {
-                    Text("Quit")
-                        .font(.caption.bold())
-                        .foregroundStyle(.red)
-                }
-            }
-
-            Spacer()
 
             // Topic legend
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 ForEach(game.selectedTopics.prefix(5)) { topic in
-                    HStack(spacing: 4) {
+                    HStack(spacing: 5) {
                         Circle()
                             .fill(topicColors[topic.id] ?? .blue)
-                            .frame(width: 8, height: 8)
+                            .frame(width: 10, height: 10)
                         Text(topic.name)
-                            .font(.caption2)
+                            .font(.caption)
                             .lineLimit(1)
                     }
                 }
+                Spacer()
             }
         }
     }

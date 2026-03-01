@@ -204,6 +204,22 @@ final class GameState {
             board[position].state = .wrong
             wrongCount += 1
 
+            // Check lose — burned corner during pick: no viable corner left
+            // A corner is viable only if its diagonally opposite corner is also unburned
+            if isCornerPick {
+                let hasViableCorner = board.corners.contains { corner in
+                    let state = board[corner].state
+                    guard state != .wrong else { return false }
+                    let opposite = Board.oppositeCorner(of: corner, gridSize: board.size)
+                    return board[opposite].state != .wrong
+                }
+                if !hasViableCorner {
+                    self.board = board
+                    phase = .lostStuck
+                    return
+                }
+            }
+
             // Check lose — missed the goal corner (burned, can never win)
             if !isCornerPick && position == board.endPosition {
                 self.board = board

@@ -85,7 +85,7 @@ struct HomeView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Fast Game")
                                     .font(.callout.bold())
-                                Text("Auto-dismiss wrong answers after 2s")
+                                Text("No AI suggestions, no delays")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                             }
