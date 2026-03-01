@@ -8,6 +8,9 @@ struct BoardView: View {
     @State private var activeCell: CellPosition?
     @State private var showQuestion = false
     @State private var showQuitConfirm = false
+    @State private var suggestionText: String?
+    @State private var isLoadingSuggestion = false
+    @State private var suggestionTask: Task<Void, Never>?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -15,6 +18,10 @@ struct BoardView: View {
             header
                 .padding(.horizontal)
                 .padding(.top, 8)
+
+            // AI Suggestion Banner
+            suggestionBanner
+                .padding(.horizontal)
 
             Spacer(minLength: 8)
 
@@ -66,6 +73,9 @@ struct BoardView: View {
             Button("Quit", role: .destructive) { onQuit?() }
         } message: {
             Text("Your progress will be lost.")
+        }
+        .onChange(of: game.currentPosition) {
+            fetchSuggestion()
         }
     }
 
@@ -201,5 +211,108 @@ struct BoardView: View {
                 }
             }
         }
+    }
+
+    // MARK: - AI Suggestion Banner
+
+    @ViewBuilder
+    private var suggestionBanner: some View {
+        #if canImport(FoundationModels)
+        if #available(iOS 26, *) {
+            if !game.fastGame && game.phase == .playing
+                && !game.choosingCorner && !game.choosingSecondCorner
+                && (isLoadingSuggestion || suggestionText != nil) {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(.purple)
+                        .font(.caption)
+
+                    if isLoadingSuggestion {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Thinking...")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else if let text = suggestionText {
+                        Text(text)
+                            .font(.caption)
+                            .foregroundStyle(.primary)
+                            .lineLimit(3)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+                .padding(8)
+                .background(.purple.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                .transition(.opacity.combined(with: .move(edge: .top)))
+                .animation(.easeInOut(duration: 0.3), value: suggestionText)
+                .animation(.easeInOut(duration: 0.3), value: isLoadingSuggestion)
+            }
+        }
+        #endif
+    }
+
+    private func fetchSuggestion() {
+        #if canImport(FoundationModels)
+        guard #available(iOS 26, *) else { return }
+
+        // Only fetch when Fast Game is off
+        guard !game.fastGame else {
+            suggestionText = nil
+            isLoadingSuggestion = false
+            return
+        }
+
+        guard let board = game.board,
+              let position = game.currentPosition,
+              game.phase == .playing,
+              !game.choosingCorner,
+              !game.choosingSecondCorner else {
+            suggestionText = nil
+            isLoadingSuggestion = false
+            return
+        }
+
+        guard MoveAdvisor.isAvailable else { return }
+
+        let available = game.availableCells()
+        guard !available.isEmpty else {
+            suggestionText = nil
+            isLoadingSuggestion = false
+            return
+        }
+
+        // Cancel any in-flight suggestion
+        suggestionTask?.cancel()
+        isLoadingSuggestion = true
+        suggestionText = nil
+
+        let advisor = MoveAdvisor()
+        let variant = game.variant
+        let lives = game.livesRemaining
+        let moves = game.moveCount
+        let wrong = game.wrongCount
+        let score = game.score
+        let leg = game.leg
+        let mode = game.mode
+
+        suggestionTask = Task {
+            let result = await advisor.suggest(
+                board: board,
+                currentPosition: position,
+                availableCells: available,
+                variant: variant,
+                livesRemaining: lives,
+                moveCount: moves,
+                wrongCount: wrong,
+                score: score,
+                leg: leg,
+                mode: mode
+            )
+            guard !Task.isCancelled else { return }
+            suggestionText = result
+            isLoadingSuggestion = false
+        }
+        #endif
     }
 }

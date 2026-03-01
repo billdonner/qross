@@ -61,6 +61,17 @@ Qross uses a simple versioning scheme — no client/server API version negotiati
 - `GameCenterManager` is `@Observable` — drives leaderboard UI based on auth state
 - `TopicPalette.assign()` dynamically assigns colors at game start — colors are not persisted or sent over the wire
 - `Board` is a value type (struct) — immutable after generation, mutated via copy-on-write in GameState
+- `MoveAdvisor` uses Apple FoundationModels (on-device LLM, iOS 26+) — wrapped in `#if canImport(FoundationModels)` + `@available(iOS 26, *)`, zero impact on older iOS
+
+## AI Move Suggestions
+
+When Fast Game is OFF, the on-device Apple Intelligence model provides strategic move suggestions after each correct answer:
+- **File:** `Qross/Services/MoveAdvisor.swift` — FoundationModels wrapper + prompt builder
+- **UI:** Purple-tinted banner between header and grid in `BoardView.swift`
+- Fresh `LanguageModelSession` per suggestion (avoids context accumulation)
+- Triggers on `game.currentPosition` change, cancels previous Task on rapid moves
+- Silent no-op when: iOS < 26, Apple Intelligence disabled, Fast Game ON, corner-picking, or game over
+- Reads board state (topics, difficulty, distance to goal) but never mutates game state
 
 ## API Dependency
 
@@ -234,7 +245,8 @@ qross/
 │   ├── Services/
 │   │   ├── APIClient.swift        # cardzerver API
 │   │   ├── QuestionCache.swift    # Offline question storage
-│   │   └── GameCenterManager.swift
+│   │   ├── GameCenterManager.swift
+│   │   └── MoveAdvisor.swift      # On-device AI move suggestions (iOS 26+)
 │   ├── Assets.xcassets/
 │   └── Info.plist
 ├── QrossClip/               # App Clip target

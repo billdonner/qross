@@ -45,6 +45,8 @@ targets:
         group: Shared/Views
       - path: Qross/Views/CellView.swift
         group: Shared/Views
+      - path: Qross/Services/MoveAdvisor.swift
+        group: Shared/Services
       - path: Qross/Views/QuestionOverlay.swift
         group: Shared/Views
     settings:
