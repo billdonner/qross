@@ -8,7 +8,9 @@ struct BoardView: View {
     @State private var activeCell: CellPosition?
     @State private var showQuestion = false
     @State private var showQuitConfirm = false
-    @State private var suggestionText: String?
+    @State private var suggestedPosition: CellPosition?
+    @State private var suggestionReason: String?
+    @State private var suggestedPath: Set<CellPosition> = []
     @State private var isLoadingSuggestion = false
     @State private var suggestionTask: Task<Void, Never>?
 
@@ -158,7 +160,12 @@ struct BoardView: View {
                     variant: game.variant,
                     isEnd: isEnd,
                     isCornerPick: (game.choosingCorner && isCorner && cell.state == .available) || isSecondCornerCandidate,
+                    isAISuggested: pos == suggestedPosition,
+                    isOnSuggestedPath: suggestedPath.contains(pos),
                     onTap: {
+                        suggestedPosition = nil
+                        suggestionReason = nil
+                        suggestedPath = []
                         if isSecondCornerCandidate {
                             // Second corner pick is just a selection — no question
                             game.selectSecondCorner(at: pos)
@@ -221,7 +228,7 @@ struct BoardView: View {
         if #available(iOS 26, *) {
             if !game.fastGame && game.phase == .playing
                 && !game.choosingCorner && !game.choosingSecondCorner
-                && (isLoadingSuggestion || suggestionText != nil) {
+                && (isLoadingSuggestion || suggestionReason != nil) {
                 HStack(spacing: 8) {
                     Image(systemName: "sparkles")
                         .foregroundStyle(.purple)
@@ -233,7 +240,7 @@ struct BoardView: View {
                         Text("Thinking...")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                    } else if let text = suggestionText {
+                    } else if let text = suggestionReason {
                         Text(text)
                             .font(.caption)
                             .foregroundStyle(.primary)
@@ -245,7 +252,7 @@ struct BoardView: View {
                 .padding(8)
                 .background(.purple.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
                 .transition(.opacity.combined(with: .move(edge: .top)))
-                .animation(.easeInOut(duration: 0.3), value: suggestionText)
+                .animation(.easeInOut(duration: 0.3), value: suggestionReason)
                 .animation(.easeInOut(duration: 0.3), value: isLoadingSuggestion)
             }
         }
@@ -258,7 +265,9 @@ struct BoardView: View {
 
         // Only fetch when Fast Game is off
         guard !game.fastGame else {
-            suggestionText = nil
+            suggestedPosition = nil
+            suggestionReason = nil
+            suggestedPath = []
             isLoadingSuggestion = false
             return
         }
@@ -268,7 +277,9 @@ struct BoardView: View {
               game.phase == .playing,
               !game.choosingCorner,
               !game.choosingSecondCorner else {
-            suggestionText = nil
+            suggestedPosition = nil
+            suggestionReason = nil
+            suggestedPath = []
             isLoadingSuggestion = false
             return
         }
@@ -277,7 +288,9 @@ struct BoardView: View {
 
         let available = game.availableCells()
         guard !available.isEmpty else {
-            suggestionText = nil
+            suggestedPosition = nil
+            suggestionReason = nil
+            suggestedPath = []
             isLoadingSuggestion = false
             return
         }
@@ -285,7 +298,9 @@ struct BoardView: View {
         // Cancel any in-flight suggestion
         suggestionTask?.cancel()
         isLoadingSuggestion = true
-        suggestionText = nil
+        suggestedPosition = nil
+        suggestionReason = nil
+        suggestedPath = []
 
         let advisor = MoveAdvisor()
         let variant = game.variant
@@ -310,7 +325,14 @@ struct BoardView: View {
                 mode: mode
             )
             guard !Task.isCancelled else { return }
-            suggestionText = result
+            suggestedPosition = result?.position
+            suggestionReason = result?.reason
+            if let suggested = result?.position {
+                let pathCells = board.shortestPath(from: suggested, to: board.endPosition)
+                suggestedPath = Set(pathCells)
+            } else {
+                suggestedPath = []
+            }
             isLoadingSuggestion = false
         }
         #endif

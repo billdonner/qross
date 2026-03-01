@@ -6,6 +6,8 @@ struct CellView: View {
     let variant: GameVariant
     let isEnd: Bool
     let isCornerPick: Bool // true when choosing corner and this is an available corner
+    var isAISuggested: Bool = false
+    var isOnSuggestedPath: Bool = false
     let onTap: () -> Void
 
     private var showColor: Bool {
@@ -18,6 +20,19 @@ struct CellView: View {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(backgroundColor)
                     .shadow(color: shadowColor, radius: cell.state == .available ? 4 : 2)
+
+                // AI-suggested cell highlight (solid border)
+                if isAISuggested {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.purple, lineWidth: 2.5)
+                        .shadow(color: .purple.opacity(0.5), radius: 4)
+                }
+
+                // Suggested path to goal (dashed border)
+                if isOnSuggestedPath && !isAISuggested {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.purple.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                }
 
                 // Corner-pick pulsing indicator
                 if isCornerPick && cell.state == .available {

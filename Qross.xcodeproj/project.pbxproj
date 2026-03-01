@@ -13,6 +13,7 @@
 		1493D4DCF0966BBEEE206F52 /* GameStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEDAB92762C99F52FF2CE9F /* GameStateTests.swift */; };
 		302006E1AA2BE2399134FCDF /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35ECEF08D4C40C199A3A649E /* CellView.swift */; };
 		3092C5315BE2E1976C953ED2 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B6C066F88F9714C8762E32 /* AboutView.swift */; };
+		39A3C06BFD7CD8F9A66A9D3C /* MoveAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443BEFEFF0A676D968652993 /* MoveAdvisor.swift */; };
 		3A7CD343DA6AAC18B53A141D /* GamePlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8632A03B9C7368FB58E2576 /* GamePlayView.swift */; };
 		41FE52523C88B9E3579898EB /* BoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724AB9B07254AE9926727600 /* BoardTests.swift */; };
 		4F642B9C16ADE2221AF39A9D /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E047560292F5DF643743D490 /* Challenge.swift */; };
@@ -33,6 +34,7 @@
 		A02D74D5D82B59F1128A8308 /* QuestionCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */; };
 		A0369AC75A5ABEBE9200F9C1 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EDB4BA3A64DC471AF5AC71 /* GameState.swift */; };
 		AC2DC16490FC8546AB4D7DA6 /* Challenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E047560292F5DF643743D490 /* Challenge.swift */; };
+		AF421987CC2EA1D1F616F765 /* MoveAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443BEFEFF0A676D968652993 /* MoveAdvisor.swift */; };
 		AF548D2A5050F8D0DDC0D5AE /* QuestionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442CA4B722FD1114E6592067 /* QuestionOverlay.swift */; };
 		BBD73AA44CABFE7F0AEBB052 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4760C973A278CC064D914C /* StatsView.swift */; };
 		C0A278491433A32134486AAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9553A485CFD8C8247E9D385 /* Assets.xcassets */; };
@@ -63,6 +65,7 @@
 		3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuestionCache.swift; path = Qross/Services/QuestionCache.swift; sourceTree = "<group>"; };
 		40B6C066F88F9714C8762E32 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		442CA4B722FD1114E6592067 /* QuestionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuestionOverlay.swift; path = Qross/Views/QuestionOverlay.swift; sourceTree = "<group>"; };
+		443BEFEFF0A676D968652993 /* MoveAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MoveAdvisor.swift; path = Qross/Services/MoveAdvisor.swift; sourceTree = "<group>"; };
 		44D886EB7BC044835E653E49 /* QrossClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QrossClip.entitlements; sourceTree = "<group>"; };
 		48DC8159D3F9FEFD4B5FA70E /* Qross.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Qross.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DEAA383C294C2DC4F129AFB /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BoardView.swift; path = Qross/Views/BoardView.swift; sourceTree = "<group>"; };
@@ -155,6 +158,7 @@
 			children = (
 				7152E319247A9A0905237356 /* APIClient.swift */,
 				9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */,
+				443BEFEFF0A676D968652993 /* MoveAdvisor.swift */,
 				3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */,
 			);
 			path = Services;
@@ -195,6 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				7152E319247A9A0905237356 /* APIClient.swift */,
+				443BEFEFF0A676D968652993 /* MoveAdvisor.swift */,
 				3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */,
 			);
 			name = Services;
@@ -357,6 +362,7 @@
 				4F642B9C16ADE2221AF39A9D /* Challenge.swift in Sources */,
 				94C173EB4AF55E0C1DCB2146 /* ClipContentView.swift in Sources */,
 				A0369AC75A5ABEBE9200F9C1 /* GameState.swift in Sources */,
+				39A3C06BFD7CD8F9A66A9D3C /* MoveAdvisor.swift in Sources */,
 				5C45B963746A173D35FE7A19 /* QrossClipApp.swift in Sources */,
 				63E4F6EDD64BA9922F137246 /* QuestionCache.swift in Sources */,
 				AF548D2A5050F8D0DDC0D5AE /* QuestionOverlay.swift in Sources */,
@@ -380,6 +386,7 @@
 				5019EF61F2C5EAB9E6520282 /* GameState.swift in Sources */,
 				DC6F88FDDAB85108125AF16C /* HomeView.swift in Sources */,
 				61E373B53BFF9417B517E908 /* HowToPlayView.swift in Sources */,
+				AF421987CC2EA1D1F616F765 /* MoveAdvisor.swift in Sources */,
 				0BBD26C0F9E7F06FA06C6D23 /* OnboardingView.swift in Sources */,
 				7F548234B202BCFA43B40BEB /* QrossApp.swift in Sources */,
 				A02D74D5D82B59F1128A8308 /* QuestionCache.swift in Sources */,
@@ -541,7 +548,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				INFOPLIST_FILE = Qross/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -561,7 +568,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				INFOPLIST_FILE = Qross/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

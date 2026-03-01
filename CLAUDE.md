@@ -67,9 +67,12 @@ Qross uses a simple versioning scheme — no client/server API version negotiati
 
 When Fast Game is OFF, the on-device Apple Intelligence model provides strategic move suggestions after each correct answer:
 - **File:** `Qross/Services/MoveAdvisor.swift` — FoundationModels wrapper + prompt builder
-- **UI:** Purple-tinted banner between header and grid in `BoardView.swift`
+- **Structured output:** `@Generable MoveSuggestion` returns `cellLabel` + `reason`; prompt labels available cells A/B/C with direction, topic, difficulty, and goal assessment — small model picks the best letter
+- **Return type:** `(position: CellPosition, reason: String)?` — maps the chosen label back to a board position
+- **UI:** Purple-tinted banner between header and grid shows the reason; recommended cell gets a purple border overlay in `CellView` (via `isAISuggested` parameter)
 - Fresh `LanguageModelSession` per suggestion (avoids context accumulation)
 - Triggers on `game.currentPosition` change, cancels previous Task on rapid moves
+- Purple highlight clears immediately on any cell tap
 - Silent no-op when: iOS < 26, Apple Intelligence disabled, Fast Game ON, corner-picking, or game over
 - Reads board state (topics, difficulty, distance to goal) but never mutates game state
 

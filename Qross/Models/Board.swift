@@ -206,6 +206,28 @@ struct Board: Codable {
         )
     }
 
+    /// BFS shortest path from `from` to `to` through traversable cells (untouched, available, or correct).
+    func shortestPath(from start: CellPosition, to goal: CellPosition) -> [CellPosition] {
+        if start == goal { return [] }
+        var visited: Set<CellPosition> = [start]
+        var queue: [(pos: CellPosition, path: [CellPosition])] = [(start, [])]
+        var head = 0
+        while head < queue.count {
+            let (current, path) = queue[head]
+            head += 1
+            for neighbor in current.neighbors(gridSize: size) {
+                if visited.contains(neighbor) { continue }
+                let state = self[neighbor].state
+                guard state == .untouched || state == .available || state == .correct else { continue }
+                let newPath = path + [neighbor]
+                if neighbor == goal { return newPath }
+                visited.insert(neighbor)
+                queue.append((neighbor, newPath))
+            }
+        }
+        return [] // no path found
+    }
+
     subscript(pos: CellPosition) -> Cell {
         get { cells[pos.row][pos.col] }
         set { cells[pos.row][pos.col] = newValue }
