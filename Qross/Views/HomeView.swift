@@ -236,8 +236,10 @@ struct HomeView: View {
         do {
             let topics = try await QrossAPI.fetchCategories()
             availableTopics = topics.filter { $0.questionCount >= 20 }
-            // Auto-select first 3 topics so play button works immediately
-            game.selectedTopics = Array(availableTopics.prefix(3))
+            // Auto-select preferred default topics
+            let preferredIds = ["Arts & Literature", "General Knowledge"]
+            let defaults = availableTopics.filter { preferredIds.contains($0.name) }
+            game.selectedTopics = defaults.isEmpty ? Array(availableTopics.prefix(2)) : defaults
         } catch {
             errorMessage = "Could not load topics. Check your connection."
         }
