@@ -47,6 +47,7 @@ final class GameState {
     var mode: GameMode = .single
     var selectedTopics: [Topic] = []
     var boardSize: Int = 5
+    var fastGame: Bool = false
     var cornerPair: CornerPair = .topLeftToBottomRight
     var leg: Int = 1
     var choosingSecondCorner: Bool = false

@@ -54,7 +54,8 @@ struct BoardView: View {
                     },
                     onHintUsed: { cost in
                         game.useHint(cost: cost)
-                    }
+                    },
+                    fastGame: game.fastGame
                 )
                 .transition(.scale.combined(with: .opacity))
             }

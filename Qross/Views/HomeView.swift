@@ -9,6 +9,7 @@ struct HomeView: View {
     @State private var showGame = false
     @State private var showHowToPlay = false
     @State private var showAbout = false
+    @AppStorage("fastGame") private var fastGame = false
 
     var body: some View {
         NavigationStack {
@@ -77,6 +78,20 @@ struct HomeView: View {
                                 }
                             }
                             .pickerStyle(.segmented)
+                        }
+
+                        // Fast Game toggle
+                        Toggle(isOn: $fastGame) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Fast Game")
+                                    .font(.callout.bold())
+                                Text("Auto-dismiss wrong answers after 2s")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .onChange(of: fastGame) { _, newValue in
+                            game.fastGame = newValue
                         }
 
                         // Topic selection
@@ -160,6 +175,7 @@ struct HomeView: View {
                 AboutView()
             }
             .task {
+                game.fastGame = fastGame
                 gcManager.authenticate()
                 await loadTopics()
             }

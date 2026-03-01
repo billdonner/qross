@@ -7,12 +7,20 @@ struct QuestionOverlay: View {
     let onAnswer: (Int) -> Void
     let onDismiss: () -> Void
     let onHintUsed: (Int) -> Void  // cost passed back to GameState
+    let fastGame: Bool
 
     @State private var selectedIndex: Int?
     @State private var revealed = false
+    @State private var waitingForContinue = false
     @State private var showHintText = false
     @State private var eliminatedIndices: Set<Int> = []
     @State private var reported = false
+
+    /// Whether the player's selected answer is correct
+    private var isCorrectAnswer: Bool {
+        guard let idx = selectedIndex else { return false }
+        return challenge.choices[idx].isCorrect
+    }
 
     /// Whether a hint-text hint is available (card has hint and not yet shown)
     private var canShowHint: Bool {
@@ -83,8 +91,20 @@ struct QuestionOverlay: View {
                             guard !revealed else { return }
                             selectedIndex = index
                             revealed = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                onAnswer(index)
+                            let correct = challenge.choices[index].isCorrect
+                            if correct {
+                                // Correct: always auto-dismiss at 0.8s
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                    onAnswer(index)
+                                }
+                            } else if fastGame {
+                                // Fast Game ON + wrong: auto-dismiss after 2s
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                    onAnswer(index)
+                                }
+                            } else {
+                                // Fast Game OFF + wrong: wait for Continue button
+                                waitingForContinue = true
                             }
                         } label: {
                             HStack {
@@ -104,6 +124,10 @@ struct QuestionOverlay: View {
                                 if revealed && index == selectedIndex {
                                     Image(systemName: choice.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                                         .foregroundStyle(choice.isCorrect ? .green : .red)
+                                } else if revealed && choice.isCorrect && !isCorrectAnswer {
+                                    // Show checkmark on correct answer when player got it wrong
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.green)
                                 }
                             }
                             .padding(12)
@@ -134,6 +158,25 @@ struct QuestionOverlay: View {
                 reportButton
                     .padding(.top, 12)
                     .transition(.opacity)
+            }
+
+            // Continue button (Fast Game OFF + wrong answer)
+            if waitingForContinue {
+                Button {
+                    if let idx = selectedIndex {
+                        onAnswer(idx)
+                    }
+                } label: {
+                    Text("Continue")
+                        .font(.callout.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.blue)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(.top, 16)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
         .padding(24)
@@ -285,7 +328,7 @@ struct QuestionOverlay: View {
             return choice.isCorrect ? Color.green.opacity(0.15) : Color.red.opacity(0.15)
         }
         if choice.isCorrect {
-            return Color.green.opacity(0.1)
+            return Color.green.opacity(0.2)
         }
         return Color(.systemBackground).opacity(0.4)
     }
