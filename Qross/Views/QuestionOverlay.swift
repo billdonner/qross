@@ -139,35 +139,45 @@ struct QuestionOverlay: View {
 
     private var hintButtons: some View {
         HStack(spacing: 12) {
-            if canShowHint {
-                Button {
-                    showHintText = true
-                    onHintUsed(1)
-                } label: {
-                    Label("Hint +1", systemImage: "lightbulb")
-                        .font(.caption.bold())
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Color.yellow.opacity(0.15))
-                        .foregroundStyle(.orange)
-                        .clipShape(Capsule())
+            // Show Hint button — always visible, disabled when no hint
+            Button {
+                showHintText = true
+                onHintUsed(1)
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "lightbulb.fill")
+                    Text("Show Hint")
+                    Text("+1")
+                        .fontWeight(.heavy)
                 }
+                .font(.callout.bold())
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(canShowHint ? Color.yellow.opacity(0.2) : Color.gray.opacity(0.1))
+                .foregroundStyle(canShowHint ? .primary : .quaternary)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .disabled(!canShowHint)
 
-            if canEliminate {
-                Button {
-                    eliminateOneWrong()
-                    onHintUsed(2)
-                } label: {
-                    Label("Eliminate +2", systemImage: "minus.circle")
-                        .font(.caption.bold())
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Color.red.opacity(0.1))
-                        .foregroundStyle(.red)
-                        .clipShape(Capsule())
+            // Eliminate button — always visible, disabled when can't eliminate
+            Button {
+                eliminateOneWrong()
+                onHintUsed(2)
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "minus.circle.fill")
+                    Text("Eliminate")
+                    Text("+2")
+                        .fontWeight(.heavy)
                 }
+                .font(.callout.bold())
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(canEliminate ? Color.red.opacity(0.15) : Color.gray.opacity(0.1))
+                .foregroundStyle(canEliminate ? .primary : .quaternary)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .disabled(!canEliminate)
         }
     }
 
