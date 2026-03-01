@@ -50,6 +50,34 @@ struct QrossAPI {
             )
         }
     }
+
+    /// Report a question — fire-and-forget, errors silently ignored
+    static func reportQuestion(
+        challengeId: String,
+        topic: String?,
+        question: String,
+        reason: String = "inaccurate",
+        detail: String? = nil
+    ) {
+        Task {
+            guard let url = URL(string: "\(baseURL)/api/v1/reports") else { return }
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            var body: [String: String] = [
+                "app_id": "qross",
+                "challenge_id": challengeId,
+                "question_text": question,
+                "reason": reason,
+            ]
+            if let topic { body["topic"] = topic }
+            if let detail { body["detail"] = detail }
+
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+            _ = try? await URLSession.shared.data(for: request)
+        }
+    }
 }
 
 // MARK: - API Response Models

@@ -12,6 +12,7 @@ struct QuestionOverlay: View {
     @State private var revealed = false
     @State private var showHintText = false
     @State private var eliminatedIndices: Set<Int> = []
+    @State private var reported = false
 
     /// Whether a hint-text hint is available (card has hint and not yet shown)
     private var canShowHint: Bool {
@@ -127,6 +128,13 @@ struct QuestionOverlay: View {
                     .padding(.top, 16)
                     .transition(.opacity)
             }
+
+            // Report question (after reveal)
+            if revealed {
+                reportButton
+                    .padding(.top, 12)
+                    .transition(.opacity)
+            }
         }
         .padding(24)
         .background(.ultraThinMaterial)
@@ -179,6 +187,54 @@ struct QuestionOverlay: View {
             }
             .disabled(!canEliminate)
         }
+    }
+
+    // MARK: - Report
+
+    private var reportButton: some View {
+        HStack(spacing: 8) {
+            Button {
+                reported = true
+                QrossAPI.reportQuestion(
+                    challengeId: challenge.id.uuidString,
+                    topic: topicName,
+                    question: challenge.question,
+                    reason: "inaccurate"
+                )
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: reported ? "checkmark.circle.fill" : "flag")
+                    Text(reported ? "Reported" : "Report Question")
+                }
+                .font(.caption)
+                .foregroundStyle(reported ? .green : .secondary)
+            }
+            .disabled(reported)
+
+            if reported, let mailto = reportMailtoURL {
+                Link(destination: mailto) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "envelope")
+                        Text("Email Details")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private var reportMailtoURL: URL? {
+        let subject = "Qross: Question Report"
+        let body = "Question: \(challenge.question)\nTopic: \(topicName)\nChallenge ID: \(challenge.id.uuidString)\n\nPlease describe the issue:\n"
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = "support@qross.app"
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: subject),
+            URLQueryItem(name: "body", value: body),
+        ]
+        return components.url
     }
 
     // MARK: - Eliminate
