@@ -41,7 +41,7 @@ struct QuestionOverlay: View {
             // Topic badge + difficulty
             HStack {
                 Text(topicName)
-                    .font(.caption.bold())
+                    .font(.subheadline.bold())
                     .padding(.horizontal, 12)
                     .padding(.vertical, 4)
                     .background(topicColor.opacity(0.2))
@@ -147,7 +147,7 @@ struct QuestionOverlay: View {
             // Explanation (after reveal)
             if revealed, let explanation = challenge.explanation {
                 Text(explanation)
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding(.top, 16)
                     .transition(.opacity)
@@ -250,7 +250,7 @@ struct QuestionOverlay: View {
                     Image(systemName: reported ? "checkmark.circle.fill" : "flag")
                     Text(reported ? "Reported" : "Report Question")
                 }
-                .font(.caption)
+                .font(.subheadline)
                 .foregroundStyle(reported ? .green : .secondary)
             }
             .disabled(reported)
@@ -261,7 +261,7 @@ struct QuestionOverlay: View {
                         Image(systemName: "envelope")
                         Text("Email Details")
                     }
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                 }
             }
@@ -296,7 +296,7 @@ struct QuestionOverlay: View {
 
     private var difficultyBadge: some View {
         Text(challenge.difficulty.rawValue.capitalized)
-            .font(.caption2.bold())
+            .font(.caption.bold())
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(difficultyColor.opacity(0.2))

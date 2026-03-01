@@ -51,7 +51,7 @@ struct CellView: View {
                 // Goal marker — small star on the destination corner
                 if isEnd && cell.state != .correct {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 10))
+                        .font(.caption2)
                         .foregroundStyle(.white.opacity(0.8))
                 }
 
@@ -59,11 +59,11 @@ struct CellView: View {
                 switch cell.state {
                 case .correct:
                     Image(systemName: "checkmark")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.callout.bold())
                         .foregroundStyle(.white)
                 case .wrong:
                     Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.callout.bold())
                         .foregroundStyle(.white.opacity(0.8))
                 case .available:
                     if !isCornerPick {

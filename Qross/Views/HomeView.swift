@@ -44,7 +44,7 @@ struct HomeView: View {
                         // Board size picker
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Board Size")
-                                .font(.caption.bold())
+                                .font(.subheadline.bold())
                                 .foregroundStyle(.secondary)
                             Picker("Size", selection: $game.boardSize) {
                                 ForEach([4, 5, 6, 7, 8], id: \.self) { s in
@@ -57,7 +57,7 @@ struct HomeView: View {
                         // Variant picker
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Variant")
-                                .font(.caption.bold())
+                                .font(.subheadline.bold())
                                 .foregroundStyle(.secondary)
                             Picker("Variant", selection: $game.variant) {
                                 ForEach([GameVariant.faceUp, .faceDown, .blind], id: \.self) { v in
@@ -70,7 +70,7 @@ struct HomeView: View {
                         // Mode picker
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Mode")
-                                .font(.caption.bold())
+                                .font(.subheadline.bold())
                                 .foregroundStyle(.secondary)
                             Picker("Mode", selection: $game.mode) {
                                 ForEach(GameMode.allCases) { m in
@@ -86,7 +86,7 @@ struct HomeView: View {
                                 Text("Fast Game")
                                     .font(.callout.bold())
                                 Text("No AI suggestions, no delays")
-                                    .font(.caption2)
+                                    .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -124,7 +124,7 @@ struct HomeView: View {
 
                         if let error = errorMessage {
                             Text(error)
-                                .font(.caption)
+                                .font(.subheadline)
                                 .foregroundStyle(.red)
                         }
                     }
@@ -188,11 +188,11 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Topics")
-                    .font(.caption.bold())
+                    .font(.subheadline.bold())
                     .foregroundStyle(.secondary)
                 Spacer()
                 Text("\(game.selectedTopics.count) selected")
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
@@ -209,10 +209,10 @@ struct HomeView: View {
                         } label: {
                             VStack(spacing: 4) {
                                 Text(topic.name)
-                                    .font(.caption.bold())
+                                    .font(.subheadline.bold())
                                     .lineLimit(1)
                                 Text("\(topic.questionCount)")
-                                    .font(.caption2)
+                                    .font(.caption)
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)

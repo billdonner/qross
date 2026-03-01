@@ -60,7 +60,7 @@ struct GamePlayView: View {
                                 .font(.title3.bold())
                             if game.mode == .doubleCross {
                                 Text("Double Cross")
-                                    .font(.caption2.bold())
+                                    .font(.caption.bold())
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 1)
                                     .background(Color.purple.opacity(0.2))
@@ -70,7 +70,7 @@ struct GamePlayView: View {
                         }
                         if let reason {
                             Text(reason)
-                                .font(.caption)
+                                .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -84,7 +84,7 @@ struct GamePlayView: View {
                         .font(.title2.bold())
                         .foregroundStyle(won ? .green : .red)
                     Text("score")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -145,7 +145,7 @@ struct GamePlayView: View {
                 .font(.callout.bold())
                 .foregroundStyle(color)
             Text(label)
-                .font(.caption2)
+                .font(.caption)
                 .foregroundStyle(.secondary)
         }
     }

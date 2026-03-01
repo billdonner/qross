@@ -91,7 +91,7 @@ struct BoardView: View {
                         .font(.title2.bold())
                     if game.mode == .doubleCross {
                         Text("Leg \(game.leg) of 2")
-                            .font(.caption.bold())
+                            .font(.subheadline.bold())
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(Color.purple.opacity(0.2))
@@ -102,15 +102,15 @@ struct BoardView: View {
                 if let board = game.board {
                     if game.choosingCorner {
                         Text("\(board.size)×\(board.size) — Pick a corner!")
-                            .font(.caption)
+                            .font(.subheadline)
                             .foregroundStyle(.orange)
                     } else if game.choosingSecondCorner {
                         Text("\(board.size)×\(board.size) — Pick your next target!")
-                            .font(.caption)
+                            .font(.subheadline)
                             .foregroundStyle(.purple)
                     } else {
                         Text("\(board.size)×\(board.size) \(board.cornerPair.arrow)")
-                            .font(.caption)
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -122,7 +122,7 @@ struct BoardView: View {
                 Text("\(game.moveCount) moves")
                     .font(.headline.monospacedDigit())
                 Text("Score: \(game.score)")
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
         }
@@ -218,7 +218,7 @@ struct BoardView: View {
                             .fill(topicColors[topic.id] ?? .blue)
                             .frame(width: 10, height: 10)
                         Text(topic.name)
-                            .font(.caption)
+                            .font(.subheadline)
                             .lineLimit(1)
                     }
                 }
@@ -239,17 +239,17 @@ struct BoardView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "sparkles")
                         .foregroundStyle(.purple)
-                        .font(.caption)
+                        .font(.subheadline)
 
                     if isLoadingSuggestion {
                         ProgressView()
                             .controlSize(.small)
                         Text("Thinking...")
-                            .font(.caption)
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     } else if let text = suggestionReason {
                         Text(text)
-                            .font(.caption)
+                            .font(.subheadline)
                             .foregroundStyle(.primary)
                             .lineLimit(3)
                     }
