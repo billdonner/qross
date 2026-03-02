@@ -20,29 +20,27 @@ struct HomeView: View {
                 gridBackground
                     .ignoresSafeArea()
 
-                VStack(spacing: 32) {
-                    Spacer()
-
-                    // Logo
-                    VStack(spacing: 8) {
-                        Text("Qross")
-                            .font(.system(size: 56, weight: .black, design: .rounded))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [.blue, .purple, .pink],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Logo
+                        VStack(spacing: 8) {
+                            Text("Qross")
+                                .font(.system(size: 56, weight: .black, design: .rounded))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.blue, .purple, .pink],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
-                            )
-                        Text("Navigate. Answer. Conquer.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
+                            Text("Navigate. Answer. Conquer.")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.top, 16)
 
-                    Spacer()
-
-                    // Main actions
-                    VStack(spacing: 16) {
+                        // Main actions
+                        VStack(spacing: 16) {
                         // Difficulty presets
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Quick Start")
@@ -205,8 +203,8 @@ struct HomeView: View {
                                 .font(.callout)
                         }
                     }
-
-                    Spacer()
+                    .padding(.bottom, 16)
+                    }
                 }
             }
             .fullScreenCover(isPresented: $showGame) {
