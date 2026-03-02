@@ -17,13 +17,13 @@ struct AIExplanation {
 
 @Generable
 struct AIGameAnalysis {
-    @Guide(description: "One or two sentences analyzing the player's performance and suggesting improvement")
+    @Guide(description: "One or two sentences analyzing your performance and suggesting improvement, addressing you directly")
     var analysis: String
 }
 
 @Generable
 struct AIBoardPreview {
-    @Guide(description: "One sentence previewing what to expect from this board's topic mix")
+    @Guide(description: "One sentence previewing what you should expect from this board's topic mix, addressing you directly")
     var preview: String
 }
 
@@ -116,12 +116,12 @@ final class QrossAI {
             Performance by topic:
             \(topicSummary)
 
-            Give a brief analysis of the player's performance. Note strengths and weaknesses.
+            Give a brief analysis of how I did. Note my strengths and weaknesses.
             """
 
         let session = LanguageModelSession(
             model: .default,
-            instructions: "Analyze a trivia game. One to two sentences. Encouraging but honest. No emoji."
+            instructions: "Analyze a trivia game. Address the player as \"you\". One to two sentences. Encouraging but honest. No emoji."
         )
 
         do {
@@ -149,12 +149,12 @@ final class QrossAI {
             Qross \(boardSize)×\(boardSize) board preview.
             Topics: \(breakdown)
 
-            Give a one-sentence preview of what the player should expect from this board.
+            Give a one-sentence preview of what I should expect from this board.
             """
 
         let session = LanguageModelSession(
             model: .default,
-            instructions: "Preview a trivia game board. One sentence. Be playful but informative. No emoji."
+            instructions: "Preview a trivia game board. Address the player as \"you\". One sentence. Be playful but informative. No emoji."
         )
 
         do {
