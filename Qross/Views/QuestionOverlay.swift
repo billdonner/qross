@@ -8,6 +8,7 @@ struct QuestionOverlay: View {
     let onDismiss: () -> Void
     let onHintUsed: (Int) -> Void  // cost passed back to GameState
     let fastGame: Bool
+    let currentHintPenalty: Int  // cumulative hint penalty so far this game
 
     @State private var selectedIndex: Int?
     @State private var revealed = false
@@ -230,53 +231,60 @@ struct QuestionOverlay: View {
     // MARK: - Hint Buttons
 
     private var hintButtons: some View {
-        HStack(spacing: 12) {
-            // Show Hint button — AI generates if no built-in hint
-            Button {
-                showHintText = true
-                onHintUsed(1)
-                if challenge.hint == nil {
-                    isGeneratingHint = true
-                    Task {
-                        generatedHint = await QrossAI.generateHint(for: challenge)
-                        isGeneratingHint = false
+        VStack(spacing: 8) {
+            if currentHintPenalty > 0 {
+                Text("Hint penalty so far: \(currentHintPenalty) pts")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+            HStack(spacing: 12) {
+                // Show Hint button — AI generates if no built-in hint
+                Button {
+                    showHintText = true
+                    onHintUsed(1)
+                    if challenge.hint == nil {
+                        isGeneratingHint = true
+                        Task {
+                            generatedHint = await QrossAI.generateHint(for: challenge)
+                            isGeneratingHint = false
+                        }
                     }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "lightbulb.fill")
+                        Text("Hint")
+                        Text("(costs 1 pt)")
+                            .fontWeight(.regular)
+                    }
+                    .font(.callout.bold())
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(canShowHint ? Color.yellow.opacity(0.2) : Color.gray.opacity(0.1))
+                    .foregroundStyle(canShowHint ? .primary : .quaternary)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "lightbulb.fill")
-                    Text("Show Hint")
-                    Text("+1")
-                        .fontWeight(.heavy)
-                }
-                .font(.callout.bold())
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(canShowHint ? Color.yellow.opacity(0.2) : Color.gray.opacity(0.1))
-                .foregroundStyle(canShowHint ? .primary : .quaternary)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-            .disabled(!canShowHint)
+                .disabled(!canShowHint)
 
-            // Eliminate button — always visible, disabled when can't eliminate
-            Button {
-                eliminateOneWrong()
-                onHintUsed(2)
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "minus.circle.fill")
-                    Text("Eliminate")
-                    Text("+2")
-                        .fontWeight(.heavy)
+                // Eliminate button — always visible, disabled when can't eliminate
+                Button {
+                    eliminateOneWrong()
+                    onHintUsed(2)
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "minus.circle.fill")
+                        Text("Eliminate")
+                        Text("(costs 2 pts)")
+                            .fontWeight(.regular)
+                    }
+                    .font(.callout.bold())
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(canEliminate ? Color.red.opacity(0.15) : Color.gray.opacity(0.1))
+                    .foregroundStyle(canEliminate ? .primary : .quaternary)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .font(.callout.bold())
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(canEliminate ? Color.red.opacity(0.15) : Color.gray.opacity(0.1))
-                .foregroundStyle(canEliminate ? .primary : .quaternary)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .disabled(!canEliminate)
             }
-            .disabled(!canEliminate)
         }
     }
 

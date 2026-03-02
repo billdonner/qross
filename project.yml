@@ -24,7 +24,7 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SUPPORTS_MACCATALYST: false
         MARKETING_VERSION: "0.2"
-        CURRENT_PROJECT_VERSION: "10"
+        CURRENT_PROJECT_VERSION: "11"
     entitlements:
       path: Qross/Qross.entitlements
     # dependencies:

@@ -197,6 +197,7 @@ final class GameState {
                     // Single mode win, or Double Cross leg 2 win
                     self.board = board
                     phase = .won
+                    saveGame()
                     return
                 }
             }
@@ -216,6 +217,7 @@ final class GameState {
                 if !hasViableCorner {
                     self.board = board
                     phase = .lostStuck
+                    saveGame()
                     return
                 }
             }
@@ -224,6 +226,7 @@ final class GameState {
             if !isCornerPick && position == board.endPosition {
                 self.board = board
                 phase = .lostStuck
+                saveGame()
                 return
             }
 
@@ -231,6 +234,7 @@ final class GameState {
             if wrongCount >= board.maxWrong {
                 self.board = board
                 phase = .lostWrong
+                saveGame()
                 return
             }
         }
@@ -241,12 +245,52 @@ final class GameState {
         // Check lose — stuck
         if availableCells().isEmpty && phase == .playing {
             phase = .lostStuck
+            saveGame()
         }
     }
 
     /// Apply a hint penalty to the score
     func useHint(cost: Int) {
         hintPenalty += cost
+    }
+
+    // MARK: - Save Game
+
+    private func saveGame() {
+        guard let board else { return }
+        let topicResults = computeTopicResults(board: board)
+        let gameScore = GameScore(
+            date: Date(),
+            boardSize: board.size,
+            cornerPair: board.cornerPair,
+            variant: variant.rawValue,
+            mode: mode.rawValue,
+            moves: moveCount,
+            wrong: wrongCount,
+            hintPenalty: hintPenalty,
+            won: phase == .won,
+            topics: board.topics,
+            topicResults: topicResults
+        )
+        Task { await GameHistory.shared.save(gameScore) }
+    }
+
+    private func computeTopicResults(board: Board) -> [TopicResult] {
+        var results: [String: (correct: Int, wrong: Int)] = [:]
+        for r in 0..<board.size {
+            for c in 0..<board.size {
+                let cell = board.cells[r][c]
+                let topic = cell.topicColor
+                var entry = results[topic, default: (correct: 0, wrong: 0)]
+                switch cell.state {
+                case .correct: entry.correct += 1
+                case .wrong: entry.wrong += 1
+                default: break
+                }
+                results[topic] = entry
+            }
+        }
+        return results.map { TopicResult(topic: $0.key, correct: $0.value.correct, wrong: $0.value.wrong) }
     }
 
     func reset() {

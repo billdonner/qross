@@ -9,6 +9,7 @@ struct HomeView: View {
     @State private var showGame = false
     @State private var showHowToPlay = false
     @State private var showAbout = false
+    @State private var showStats = false
     @AppStorage("fastGame") private var fastGame = false
 
     var body: some View {
@@ -41,6 +42,30 @@ struct HomeView: View {
 
                     // Main actions
                     VStack(spacing: 16) {
+                        // Difficulty presets
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Quick Start")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(.secondary)
+                            HStack(spacing: 8) {
+                                presetButton(
+                                    label: "Quick Play",
+                                    description: "Learn the ropes",
+                                    size: 4, variant: .faceUp, mode: .single
+                                )
+                                presetButton(
+                                    label: "Challenge",
+                                    description: "Test your knowledge",
+                                    size: 5, variant: .faceDown, mode: .single
+                                )
+                                presetButton(
+                                    label: "Expert",
+                                    description: "For seasoned players",
+                                    size: 6, variant: .blind, mode: .doubleCross
+                                )
+                            }
+                        }
+
                         // Board size picker
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Board Size")
@@ -65,6 +90,9 @@ struct HomeView: View {
                                 }
                             }
                             .pickerStyle(.segmented)
+                            Text(variantDescription)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
 
                         // Mode picker
@@ -145,6 +173,13 @@ struct HomeView: View {
                         }
 
                         Button {
+                            showStats = true
+                        } label: {
+                            Label("Stats", systemImage: "chart.bar")
+                                .font(.callout)
+                        }
+
+                        Button {
                             showHowToPlay = true
                         } label: {
                             Label("How to Play", systemImage: "questionmark.circle")
@@ -173,6 +208,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showAbout) {
                 AboutView()
+            }
+            .sheet(isPresented: $showStats) {
+                StatsView()
             }
             .task {
                 game.fastGame = fastGame
@@ -226,6 +264,55 @@ struct HomeView: View {
                     }
                 }
             }
+        }
+    }
+
+    // MARK: - Presets
+
+    private func presetButton(label: String, description: String, size: Int, variant: GameVariant, mode: GameMode) -> some View {
+        Button {
+            game.boardSize = size
+            game.variant = variant
+            game.mode = mode
+        } label: {
+            VStack(spacing: 4) {
+                Text(label)
+                    .font(.caption.bold())
+                    .lineLimit(1)
+                Text(description)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(
+                isPresetActive(size: size, variant: variant, mode: mode)
+                    ? Color.blue.opacity(0.15) : Color(.secondarySystemBackground)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(
+                        isPresetActive(size: size, variant: variant, mode: mode)
+                            ? Color.blue : Color.clear,
+                        lineWidth: 1.5
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func isPresetActive(size: Int, variant: GameVariant, mode: GameMode) -> Bool {
+        game.boardSize == size && game.variant == variant && game.mode == mode
+    }
+
+    private var variantDescription: String {
+        switch game.variant {
+        case .faceUp: return "See all questions — pure strategy"
+        case .faceDown: return "Questions hidden until adjacent — plan ahead"
+        case .blind: return "No colors, no preview — full fog of war"
+        case .concentration: return "Match pairs before answering"
         }
     }
 

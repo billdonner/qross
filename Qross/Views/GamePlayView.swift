@@ -49,16 +49,11 @@ struct GamePlayView: View {
 
     private var resultOverlay: some View {
         let won = game.phase == .won
-        let reason: String? = switch game.phase {
-        case .lostWrong: "Too many wrong answers!"
-        case .lostStuck: "No moves left!"
-        default: nil
-        }
+        let topicResults = computeTopicResults()
 
         return VStack(spacing: 10) {
-            // Top row: result title + score stats
+            // Top row: result title
             HStack {
-                // Left: title + reason
                 HStack(spacing: 8) {
                     Text(won ? "🎉" : "💥")
                         .font(.system(size: 28))
@@ -76,40 +71,23 @@ struct GamePlayView: View {
                                     .clipShape(Capsule())
                             }
                         }
-                        if let reason {
-                            Text(reason)
+                        if !won {
+                            Text(loseMessage(topicResults: topicResults))
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
+                                .lineLimit(3)
                         }
                     }
                 }
-
                 Spacer()
-
-                // Right: score
-                VStack(spacing: 2) {
-                    Text("\(game.score)")
-                        .font(.title2.bold())
-                        .foregroundStyle(won ? .green : .red)
-                    Text("score")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
             }
 
-            // Stats row
-            HStack(spacing: 0) {
-                statItem(value: "\(game.moveCount)", label: "moves")
-                Spacer()
-                statItem(value: "\(game.wrongCount)", label: "wrong")
-                if game.hintPenalty > 0 {
-                    Spacer()
-                    statItem(value: "+\(game.hintPenalty)", label: "hints", color: .orange)
-                }
-                if won {
-                    Spacer()
-                    statItem(value: "\(game.minPossibleScore)", label: "best", color: .secondary)
-                }
+            // Score breakdown formula
+            scoreBreakdown(won: won)
+
+            // Topic performance bars
+            if !topicResults.isEmpty {
+                topicPerformanceBars(topicResults: topicResults)
             }
 
             // AI Analysis
@@ -166,14 +144,113 @@ struct GamePlayView: View {
         .padding(.horizontal, 12)
     }
 
-    private func statItem(value: String, label: String, color: Color = .primary) -> some View {
-        VStack(spacing: 1) {
-            Text(value)
-                .font(.callout.bold())
-                .foregroundStyle(color)
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    // MARK: - Score Breakdown
+
+    private func scoreBreakdown(won: Bool) -> some View {
+        VStack(spacing: 4) {
+            HStack {
+                Text("Moves")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("\(game.moveCount)")
+                    .font(.callout.bold().monospacedDigit())
+            }
+            HStack {
+                Text("Wrong")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("\(game.wrongCount) x2 = \(game.wrongCount * 2)")
+                    .font(.callout.bold().monospacedDigit())
+                    .foregroundStyle(game.wrongCount > 0 ? .red : .primary)
+            }
+            if game.hintPenalty > 0 {
+                HStack {
+                    Text("Hints")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text("\(game.hintPenalty)")
+                        .font(.callout.bold().monospacedDigit())
+                        .foregroundStyle(.orange)
+                }
+            }
+            Divider()
+            HStack {
+                Text("Score")
+                    .font(.callout.bold())
+                Spacer()
+                HStack(spacing: 8) {
+                    Text("\(game.score)")
+                        .font(.title3.bold().monospacedDigit())
+                        .foregroundStyle(won ? .green : .red)
+                    if won {
+                        Text("(best: \(game.minPossibleScore))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .padding(12)
+        .background(Color(.secondarySystemBackground).opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    // MARK: - Lose Message
+
+    private func loseMessage(topicResults: [(topic: String, correct: Int, wrong: Int)]) -> String {
+        switch game.phase {
+        case .lostWrong:
+            let maxWrong = game.board?.maxWrong ?? 3
+            if let worst = topicResults.first(where: { $0.wrong > 0 }) {
+                return "You used all \(maxWrong) lives. \(worst.topic) was toughest — \(worst.wrong) of \(worst.correct + worst.wrong) wrong. Try easier topics or a smaller board."
+            }
+            return "You used all \(maxWrong) lives. Try easier topics or a smaller board."
+        case .lostStuck:
+            return "No path to the goal — burned cells blocked the way. Try moving toward the goal early."
+        default:
+            return ""
+        }
+    }
+
+    // MARK: - Topic Performance Bars
+
+    private func topicPerformanceBars(topicResults: [(topic: String, correct: Int, wrong: Int)]) -> some View {
+        let active = topicResults.filter { $0.correct + $0.wrong > 0 }
+            .sorted { $0.wrong > $1.wrong }
+
+        return VStack(alignment: .leading, spacing: 6) {
+            ForEach(active, id: \.topic) { result in
+                HStack(spacing: 8) {
+                    Text(result.topic)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 80, alignment: .trailing)
+                        .lineLimit(1)
+
+                    GeometryReader { geo in
+                        let total = result.correct + result.wrong
+                        let greenWidth = total > 0 ? geo.size.width * CGFloat(result.correct) / CGFloat(total) : 0
+
+                        HStack(spacing: 0) {
+                            Rectangle()
+                                .fill(Color.green.opacity(0.7))
+                                .frame(width: greenWidth)
+                            Rectangle()
+                                .fill(Color.red.opacity(0.5))
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 3))
+                    }
+                    .frame(height: 10)
+
+                    Text("\(result.correct)/\(result.correct + result.wrong)")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        .frame(width: 30, alignment: .trailing)
+                }
+            }
         }
     }
 
