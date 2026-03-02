@@ -32,6 +32,9 @@ struct QrossAPI {
         let selectedCats = categories.map(Set.init)
         return decoded.challenges.compactMap { item -> Challenge? in
             if let cats = selectedCats, !cats.contains(item.topic) { return nil }
+            // Skip questions with missing or insufficient answers
+            guard item.answers.count >= 2, !item.correct.isEmpty,
+                  item.answers.contains(item.correct) else { return nil }
             // Build choices from answers array + correct string
             let correctAnswer = item.correct
             let choices = item.answers.map { ans in

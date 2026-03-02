@@ -54,6 +54,11 @@ struct BoardView: View {
                     topicName: board[pos].topicColor,
                     onAnswer: { choiceIndex in
                         game.answerCell(at: pos, choiceIndex: choiceIndex)
+                        if game.board?[pos].state == .correct {
+                            HapticEngine.correctAnswer()
+                        } else {
+                            HapticEngine.wrongAnswer()
+                        }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             showQuestion = false
                             activeCell = nil
@@ -64,6 +69,7 @@ struct BoardView: View {
                         activeCell = nil
                     },
                     onHintUsed: { cost in
+                        HapticEngine.hintUsed()
                         game.useHint(cost: cost)
                     },
                     fastGame: game.fastGame,
@@ -171,6 +177,7 @@ struct BoardView: View {
                     isAISuggested: pos == suggestedPosition,
                     isOnSuggestedPath: suggestedPath.contains(pos),
                     onTap: {
+                        HapticEngine.cellTap()
                         suggestedPosition = nil
                         suggestionReason = nil
                         suggestedPath = []
@@ -218,18 +225,20 @@ struct BoardView: View {
                 }
             }
 
-            // Difficulty legend
-            HStack(spacing: 16) {
-                ForEach(Challenge.Difficulty.allCases, id: \.rawValue) { diff in
-                    HStack(spacing: 5) {
-                        Circle()
-                            .fill(difficultyLegendColor(diff))
-                            .frame(width: 10, height: 10)
-                        Text(diff.rawValue.capitalized)
-                            .font(.subheadline)
+            // Topic color legend
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(topicColors.sorted(by: { $0.key < $1.key }), id: \.key) { topic, color in
+                        HStack(spacing: 5) {
+                            Circle()
+                                .fill(color)
+                                .frame(width: 10, height: 10)
+                            Text(topic)
+                                .font(.caption)
+                                .lineLimit(1)
+                        }
                     }
                 }
-                Spacer()
             }
         }
     }
@@ -356,14 +365,6 @@ struct BoardView: View {
         suggestionReason = nil
         suggestedPath = []
         isLoadingSuggestion = false
-    }
-
-    private func difficultyLegendColor(_ difficulty: Challenge.Difficulty) -> Color {
-        switch difficulty {
-        case .easy:   return .green
-        case .medium: return .orange
-        case .hard:   return .red
-        }
     }
 
     // MARK: - Board Preview

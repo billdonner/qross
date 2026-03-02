@@ -11,6 +11,7 @@ struct GamePlayView: View {
 
     @State private var postGameAnalysis: String?
     @State private var isAnalyzing = false
+    @State private var showConfetti = false
 
     private var gameOver: Bool {
         game.phase == .won || game.phase == .lostWrong || game.phase == .lostStuck
@@ -35,13 +36,25 @@ struct GamePlayView: View {
                     }
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
+
+                // Confetti on win
+                if showConfetti {
+                    ConfettiView()
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                }
             } else {
                 ProgressView()
             }
         }
         .animation(.spring(duration: 0.4), value: gameOver)
         .onChange(of: game.phase) { _, newPhase in
-            if newPhase == .won || newPhase == .lostWrong || newPhase == .lostStuck {
+            if newPhase == .won {
+                HapticEngine.win()
+                showConfetti = true
+                fetchAnalysis()
+            } else if newPhase == .lostWrong || newPhase == .lostStuck {
+                HapticEngine.lose()
                 fetchAnalysis()
             }
         }
@@ -111,16 +124,14 @@ struct GamePlayView: View {
 
             // Actions
             HStack(spacing: 12) {
-                if won {
-                    let shareText = game.shareText()
-                    ShareLink(item: shareText) {
-                        Label("Share", systemImage: "square.and.arrow.up")
-                            .font(.callout.bold())
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Capsule())
-                    }
+                let shareText = game.shareText()
+                ShareLink(item: shareText) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                        .font(.callout.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
                 }
 
                 Button {

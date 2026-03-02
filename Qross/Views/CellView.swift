@@ -10,19 +10,13 @@ struct CellView: View {
     var isOnSuggestedPath: Bool = false
     let onTap: () -> Void
 
-    /// Color derived from question difficulty
-    private var difficultyColor: Color {
-        switch cell.challenge.difficulty {
-        case .easy:   return Color.green
-        case .medium: return Color.orange
-        case .hard:   return Color.red
-        }
-    }
+    @State private var flashCorrect = false
+    @State private var shakeWrong = false
 
     private var showColor: Bool {
         switch variant {
         case .faceUp:
-            return true  // all cells show difficulty colors
+            return true  // all cells show topic colors
         case .faceDown:
             // only revealed cells (correct, wrong, available) show color; untouched are hidden
             return cell.state != .untouched
@@ -87,24 +81,50 @@ struct CellView: View {
             }
         }
         .disabled(cell.state != .available)
+        .scaleEffect(flashCorrect ? 1.15 : 1.0)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.green.opacity(flashCorrect ? 0.4 : 0.0))
+        )
+        .offset(x: shakeWrong ? -6 : 0)
+        .animation(.spring(duration: 0.3), value: flashCorrect)
+        .animation(
+            shakeWrong
+                ? .linear(duration: 0.08).repeatCount(5, autoreverses: true)
+                : .default,
+            value: shakeWrong
+        )
+        .onChange(of: cell.state) { _, newState in
+            if newState == .correct {
+                flashCorrect = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    flashCorrect = false
+                }
+            } else if newState == .wrong {
+                shakeWrong = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    shakeWrong = false
+                }
+            }
+        }
         .aspectRatio(1, contentMode: .fill)
     }
 
     private var backgroundColor: Color {
         switch cell.state {
         case .correct:
-            return showColor ? difficultyColor : .green
+            return showColor ? topicColor : .green
         case .wrong:
             return Color.red.opacity(0.6)
         case .available:
-            return showColor ? difficultyColor.opacity(0.7) : Color.gray.opacity(0.4)
+            return showColor ? topicColor.opacity(0.7) : Color.gray.opacity(0.4)
         case .untouched:
-            return showColor ? difficultyColor.opacity(0.3) : Color.gray.opacity(0.2)
+            return showColor ? topicColor.opacity(0.3) : Color.gray.opacity(0.2)
         }
     }
 
     private var shadowColor: Color {
-        cell.state == .available ? difficultyColor.opacity(0.5) : .clear
+        cell.state == .available ? topicColor.opacity(0.5) : .clear
     }
 }
 

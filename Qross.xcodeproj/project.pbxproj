@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		062D7DA2CF2C57B6D5F486B3 /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFF777591C8267BE1EAF4E5 /* HapticEngine.swift */; };
 		0BBD26C0F9E7F06FA06C6D23 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC911A6463C666B4AE8BCC26 /* OnboardingView.swift */; };
 		0BEE5F26CF67FEF9FCE9EA71 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7152E319247A9A0905237356 /* APIClient.swift */; };
 		13323A5270655E23BA5F5153 /* Score.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBFA9B18707C5193434F943 /* Score.swift */; };
@@ -28,6 +29,7 @@
 		63E4F6EDD64BA9922F137246 /* QuestionCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */; };
 		766463FC4307AFE22E52FAD4 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAA383C294C2DC4F129AFB /* BoardView.swift */; };
 		7F548234B202BCFA43B40BEB /* QrossApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D703B003C8D07321C1ADD2E /* QrossApp.swift */; };
+		81CDE91C132E3250F366CFD6 /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFF777591C8267BE1EAF4E5 /* HapticEngine.swift */; };
 		828FBABB320D45857D19C8FF /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7152E319247A9A0905237356 /* APIClient.swift */; };
 		92A495B12046A91A70AE45BD /* Score.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBFA9B18707C5193434F943 /* Score.swift */; };
 		94C173EB4AF55E0C1DCB2146 /* ClipContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEFDAF3603295ECE9BF2224 /* ClipContentView.swift */; };
@@ -41,6 +43,7 @@
 		C0A278491433A32134486AAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9553A485CFD8C8247E9D385 /* Assets.xcassets */; };
 		C47BB130DCF7B915B3B2BB51 /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35ECEF08D4C40C199A3A649E /* CellView.swift */; };
 		CC17821E9FAAD5B455491F42 /* GameCenterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */; };
+		D0E1A3F58B0CA0F43CB985A8 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608ADD597D9EAC32AD2C7655 /* ConfettiView.swift */; };
 		D117FF714A9003CA33AF4F2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E83EBDDBD5B63D31DE218CE /* Assets.xcassets */; };
 		DC6F88FDDAB85108125AF16C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308AC8D7C63030F44CC7C588 /* HomeView.swift */; };
 		F03614A7EFDEE5D486AA110F /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAA383C294C2DC4F129AFB /* BoardView.swift */; };
@@ -73,6 +76,7 @@
 		4DEAA383C294C2DC4F129AFB /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BoardView.swift; path = Qross/Views/BoardView.swift; sourceTree = "<group>"; };
 		5255B78D89DCDCBCDF1B184C /* QrossTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = QrossTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D703B003C8D07321C1ADD2E /* QrossApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrossApp.swift; sourceTree = "<group>"; };
+		608ADD597D9EAC32AD2C7655 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		68F6465635D9A2BF4FC9C3A9 /* QrossClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrossClipApp.swift; sourceTree = "<group>"; };
 		7152E319247A9A0905237356 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APIClient.swift; path = Qross/Services/APIClient.swift; sourceTree = "<group>"; };
 		724AB9B07254AE9926727600 /* BoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardTests.swift; sourceTree = "<group>"; };
@@ -80,6 +84,7 @@
 		9C347E629BCF88AAA8325296 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ABEFDAF3603295ECE9BF2224 /* ClipContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipContentView.swift; sourceTree = "<group>"; };
 		AC911A6463C666B4AE8BCC26 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		ADFF777591C8267BE1EAF4E5 /* HapticEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HapticEngine.swift; path = Qross/Services/HapticEngine.swift; sourceTree = "<group>"; };
 		AE17DC01A303B70BEE63F24C /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		B8632A03B9C7368FB58E2576 /* GamePlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamePlayView.swift; sourceTree = "<group>"; };
 		C724709AFEFC41F9407392EE /* QrossClip.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = QrossClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -160,6 +165,7 @@
 			children = (
 				7152E319247A9A0905237356 /* APIClient.swift */,
 				9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */,
+				ADFF777591C8267BE1EAF4E5 /* HapticEngine.swift */,
 				443BEFEFF0A676D968652993 /* MoveAdvisor.swift */,
 				2FA4510E29DB5CB2A2241621 /* QrossAI.swift */,
 				3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */,
@@ -202,6 +208,7 @@
 			isa = PBXGroup;
 			children = (
 				7152E319247A9A0905237356 /* APIClient.swift */,
+				ADFF777591C8267BE1EAF4E5 /* HapticEngine.swift */,
 				443BEFEFF0A676D968652993 /* MoveAdvisor.swift */,
 				3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */,
 			);
@@ -214,6 +221,7 @@
 				40B6C066F88F9714C8762E32 /* AboutView.swift */,
 				4DEAA383C294C2DC4F129AFB /* BoardView.swift */,
 				35ECEF08D4C40C199A3A649E /* CellView.swift */,
+				608ADD597D9EAC32AD2C7655 /* ConfettiView.swift */,
 				B8632A03B9C7368FB58E2576 /* GamePlayView.swift */,
 				308AC8D7C63030F44CC7C588 /* HomeView.swift */,
 				1F0E09812E59B637EE67BB81 /* HowToPlayView.swift */,
@@ -365,6 +373,7 @@
 				4F642B9C16ADE2221AF39A9D /* Challenge.swift in Sources */,
 				94C173EB4AF55E0C1DCB2146 /* ClipContentView.swift in Sources */,
 				A0369AC75A5ABEBE9200F9C1 /* GameState.swift in Sources */,
+				062D7DA2CF2C57B6D5F486B3 /* HapticEngine.swift in Sources */,
 				39A3C06BFD7CD8F9A66A9D3C /* MoveAdvisor.swift in Sources */,
 				5C45B963746A173D35FE7A19 /* QrossClipApp.swift in Sources */,
 				63E4F6EDD64BA9922F137246 /* QuestionCache.swift in Sources */,
@@ -384,9 +393,11 @@
 				F03614A7EFDEE5D486AA110F /* BoardView.swift in Sources */,
 				302006E1AA2BE2399134FCDF /* CellView.swift in Sources */,
 				AC2DC16490FC8546AB4D7DA6 /* Challenge.swift in Sources */,
+				D0E1A3F58B0CA0F43CB985A8 /* ConfettiView.swift in Sources */,
 				CC17821E9FAAD5B455491F42 /* GameCenterManager.swift in Sources */,
 				3A7CD343DA6AAC18B53A141D /* GamePlayView.swift in Sources */,
 				5019EF61F2C5EAB9E6520282 /* GameState.swift in Sources */,
+				81CDE91C132E3250F366CFD6 /* HapticEngine.swift in Sources */,
 				DC6F88FDDAB85108125AF16C /* HomeView.swift in Sources */,
 				61E373B53BFF9417B517E908 /* HowToPlayView.swift in Sources */,
 				AF421987CC2EA1D1F616F765 /* MoveAdvisor.swift in Sources */,
@@ -552,7 +563,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				INFOPLIST_FILE = Qross/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -572,7 +583,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				INFOPLIST_FILE = Qross/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

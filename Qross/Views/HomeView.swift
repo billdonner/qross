@@ -11,6 +11,7 @@ struct HomeView: View {
     @State private var showAbout = false
     @State private var showStats = false
     @AppStorage("fastGame") private var fastGame = false
+    @AppStorage("enableHaptics") private var enableHaptics = true
 
     var body: some View {
         NavigationStack {
@@ -120,6 +121,17 @@ struct HomeView: View {
                         }
                         .onChange(of: fastGame) { _, newValue in
                             game.fastGame = newValue
+                        }
+
+                        // Haptics toggle
+                        Toggle(isOn: $enableHaptics) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Haptics")
+                                    .font(.callout.bold())
+                                Text("Vibrations on answers, wins, and taps")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
 
                         // Topic selection
@@ -238,6 +250,7 @@ struct HomeView: View {
                 HStack(spacing: 8) {
                     ForEach(availableTopics) { topic in
                         let isSelected = game.selectedTopics.contains(topic)
+                        let diffColor = topicDifficultyColor(topic)
                         Button {
                             if isSelected {
                                 game.selectedTopics.removeAll { $0.id == topic.id }
@@ -254,16 +267,25 @@ struct HomeView: View {
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
-                            .background(isSelected ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
-                            .foregroundStyle(isSelected ? .blue : .secondary)
+                            .background(isSelected ? diffColor.opacity(0.2) : diffColor.opacity(0.08))
+                            .foregroundStyle(isSelected ? diffColor : .secondary)
                             .clipShape(Capsule())
                             .overlay(
-                                Capsule().stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                                Capsule().stroke(isSelected ? diffColor : Color.clear, lineWidth: 2)
                             )
                         }
                     }
                 }
             }
+        }
+    }
+
+    /// Color topics by estimated difficulty — more questions = easier (green), fewer = harder (red)
+    private func topicDifficultyColor(_ topic: Topic) -> Color {
+        switch topic.questionCount {
+        case 400...: return .green       // Large pool — easy
+        case 200..<400: return .orange   // Medium pool
+        default: return .red             // Small pool — harder
         }
     }
 
