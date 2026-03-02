@@ -43,7 +43,8 @@ struct QrossAPI {
                 question: item.question,
                 choices: choices,
                 correctIndex: correctIndex,
-                difficulty: Challenge.estimateDifficulty(question: item.question, answers: item.answers),
+                difficulty: Challenge.Difficulty(rawValue: item.ai_difficulty ?? "")
+                    ?? Challenge.estimateDifficulty(question: item.question, answers: item.answers),
                 topicId: item.topic,
                 hint: item.hint,
                 explanation: item.explanation
@@ -102,5 +103,6 @@ private struct GameDataResponse: Decodable {
         let correct: String
         let explanation: String?
         let hint: String?
+        let ai_difficulty: String?
     }
 }
