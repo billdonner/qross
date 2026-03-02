@@ -7,12 +7,12 @@ A beautiful standalone iOS trivia game where players navigate a colored grid fro
 - Swift 5.9, Xcode 26+
 - No SPM dependencies — pure Apple frameworks
 - Project generated with xcodegen from `project.yml`
-- Bundle ID: `com.qross.app`, Version: 0.2 (build 4)
+- Bundle ID: `com.qross.app`, Version: 0.2 (build 14)
 
 ## Common Commands
 - `cd ~/qross && xcodegen generate` — regenerate Xcode project from project.yml
 - `xcodebuild -scheme Qross -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' build` — build
-- `xcodebuild -scheme QrossTests -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' test` — run tests (9 as of 2026-02-28)
+- `xcodebuild -scheme QrossTests -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' test` — run tests (20 as of 2026-03-02)
 - `open Qross.xcodeproj` — open in Xcode
 
 ## Cross-Project Sync
@@ -231,8 +231,8 @@ Launch
             │    ├─ Pick corner (all 4 highlighted)
             │    ├─ Answer question → correct/wrong
             │    │    ├─ Hint: Show Hint (+1) / Eliminate (+2)
-            │    ├─ Win → score card + share
-            │    └─ Lose → reason + score card
+            │    ├─ Win → confetti + score card + share
+            │    └─ Lose → reason + score card + share
             ├─ How to Play (HowToPlayView, sheet)
             ├─ About (AboutView, sheet)
             └─ Leaderboards (Game Center, if authenticated)
@@ -264,15 +264,17 @@ qross/
 │   │   ├── HomeView.swift         # Main menu with size/variant/topic pickers
 │   │   ├── GamePlayView.swift     # Full-screen game container + result overlay
 │   │   ├── BoardView.swift        # The main game grid
-│   │   ├── CellView.swift         # Individual cell rendering
+│   │   ├── CellView.swift         # Individual cell rendering (bounce/shake animations)
 │   │   ├── QuestionOverlay.swift  # Question popup with hints
-│   │   ├── StatsView.swift         # Game statistics (placeholder)
+│   │   ├── ConfettiView.swift     # Canvas particle burst on win
+│   │   ├── StatsView.swift        # Game statistics + history
 │   │   ├── HowToPlayView.swift    # Rules & strategy guide
 │   │   └── AboutView.swift        # About screen with feature list
 │   ├── Services/
 │   │   ├── APIClient.swift        # cardzerver API
 │   │   ├── QuestionCache.swift    # Offline question storage
 │   │   ├── GameCenterManager.swift
+│   │   ├── HapticEngine.swift     # Centralized haptic feedback (6 feedback types)
 │   │   ├── MoveAdvisor.swift      # BFS pathfinding + AI move explanations
 │   │   └── QrossAI.swift          # AI hints, explanations, analysis, board preview
 │   ├── Assets.xcassets/
@@ -291,8 +293,10 @@ qross/
 
 - **Grid cells**: Rounded squares with topic color, subtle shadow
 - **Path**: Glowing connected line between successful cells
-- **Correct**: Green flash, confetti particles, success haptic
-- **Wrong**: Red shake, crack animation, thud haptic
+- **Correct**: Green flash + scale bounce (1.15x), success haptic
+- **Wrong**: Red shake (±6pt horizontal), error haptic
+- **Win**: Confetti particle burst (80 particles, Canvas, 3s), double success haptic
+- **Haptics**: Centralized via `HapticEngine` — toggle in HomeView settings (`@AppStorage("enableHaptics")`)
 - **Available cells**: Gentle pulse animation
 - **Unavailable cells**: Dimmed
 - **Typography**: SF Rounded for a friendly game feel
@@ -316,10 +320,12 @@ swift build -c release  # if CLI tools added later
 ## Known Issues & Fixes
 - App Clip store link is placeholder (`id0000000000`) — replace with real App Store ID after first approval
 - Daily challenge seed is `nil` (TODO in GameState.swift:65) — date-based seed generation not yet implemented
-- StatsView is a placeholder — game history persistence not yet built
+- StatsView shows game history from `GameHistory` actor (UserDefaults-backed)
 - Concentration variant enum exists but is hidden from UI picker — gameplay logic for pair-matching not implemented
 - `fetchQuestions(categories:)` filters client-side after fetching all gamedata — no server-side category filtering yet
-- Difficulty is estimated by heuristic (`Challenge.estimateDifficulty`) since the API doesn't provide it — accuracy varies
+- Difficulty uses `ai_difficulty` from API when available (client trims double-quoted values from DB bug); falls back to heuristic `Challenge.estimateDifficulty`
+- Game Center entitlement not yet added — needs provisioning profile with Game Center capability enabled in Apple Developer portal first
+- `xcodegen generate` reverts `Qross/Qross.entitlements` and `QrossClip/QrossClip.entitlements` to empty — must rewrite after running xcodegen if entitlements are needed
 
 ## Ports
 
