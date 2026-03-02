@@ -12,6 +12,9 @@ struct HomeView: View {
     @State private var showStats = false
     @AppStorage("fastGame") private var fastGame = false
     @AppStorage("enableHaptics") private var enableHaptics = true
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var showWelcomeConfetti = false
+    @State private var backgroundedAt: Date?
 
     var body: some View {
         NavigationStack {
@@ -210,6 +213,28 @@ struct HomeView: View {
 
                     .padding(.bottom, 16)
                     }
+                }
+            }
+            .overlay {
+                if showWelcomeConfetti {
+                    ConfettiView()
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                                showWelcomeConfetti = false
+                            }
+                        }
+                }
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .background {
+                    backgroundedAt = Date()
+                } else if newPhase == .active, !showGame {
+                    if let bg = backgroundedAt, Date().timeIntervalSince(bg) > 30 * 60 {
+                        showWelcomeConfetti = true
+                    }
+                    backgroundedAt = nil
                 }
             }
             .fullScreenCover(isPresented: $showGame) {
