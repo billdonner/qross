@@ -217,16 +217,15 @@ struct BoardView: View {
                 }
             }
 
-            // Topic legend
-            HStack(spacing: 12) {
-                ForEach(game.selectedTopics.prefix(5)) { topic in
+            // Difficulty legend
+            HStack(spacing: 16) {
+                ForEach(Challenge.Difficulty.allCases, id: \.rawValue) { diff in
                     HStack(spacing: 5) {
                         Circle()
-                            .fill(topicColors[topic.id] ?? .blue)
+                            .fill(difficultyLegendColor(diff))
                             .frame(width: 10, height: 10)
-                        Text(topic.name)
+                        Text(diff.rawValue.capitalized)
                             .font(.subheadline)
-                            .lineLimit(1)
                     }
                 }
                 Spacer()
@@ -356,6 +355,14 @@ struct BoardView: View {
         suggestionReason = nil
         suggestedPath = []
         isLoadingSuggestion = false
+    }
+
+    private func difficultyLegendColor(_ difficulty: Challenge.Difficulty) -> Color {
+        switch difficulty {
+        case .easy:   return .green
+        case .medium: return .orange
+        case .hard:   return .red
+        }
     }
 
     // MARK: - Board Preview

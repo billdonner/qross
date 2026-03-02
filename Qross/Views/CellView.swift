@@ -10,10 +10,19 @@ struct CellView: View {
     var isOnSuggestedPath: Bool = false
     let onTap: () -> Void
 
+    /// Color derived from question difficulty
+    private var difficultyColor: Color {
+        switch cell.challenge.difficulty {
+        case .easy:   return Color.green
+        case .medium: return Color.orange
+        case .hard:   return Color.red
+        }
+    }
+
     private var showColor: Bool {
         switch variant {
         case .faceUp:
-            return true  // all cells show topic colors
+            return true  // all cells show difficulty colors
         case .faceDown:
             // only revealed cells (correct, wrong, available) show color; untouched are hidden
             return cell.state != .untouched
@@ -84,18 +93,18 @@ struct CellView: View {
     private var backgroundColor: Color {
         switch cell.state {
         case .correct:
-            return showColor ? topicColor : .green
+            return showColor ? difficultyColor : .green
         case .wrong:
             return Color.red.opacity(0.6)
         case .available:
-            return showColor ? topicColor.opacity(0.7) : Color.gray.opacity(0.4)
+            return showColor ? difficultyColor.opacity(0.7) : Color.gray.opacity(0.4)
         case .untouched:
-            return showColor ? topicColor.opacity(0.3) : Color.gray.opacity(0.2)
+            return showColor ? difficultyColor.opacity(0.3) : Color.gray.opacity(0.2)
         }
     }
 
     private var shadowColor: Color {
-        cell.state == .available ? topicColor.opacity(0.5) : .clear
+        cell.state == .available ? difficultyColor.opacity(0.5) : .clear
     }
 }
 
