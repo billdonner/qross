@@ -2,7 +2,7 @@ name: Qross
 options:
   bundleIdPrefix: com.qross
   deploymentTarget:
-    iOS: "17.0"
+    iOS: "26.0"
   xcodeVersion: "16.0"
   generateEmptyDirectories: true
 

@@ -13,6 +13,8 @@ struct BoardView: View {
     @State private var suggestedPath: Set<CellPosition> = []
     @State private var isLoadingSuggestion = false
     @State private var suggestionTask: Task<Void, Never>?
+    @State private var boardPreview: String?
+    @State private var isLoadingPreview = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -78,6 +80,11 @@ struct BoardView: View {
         }
         .onChange(of: game.currentPosition) {
             fetchSuggestion()
+        }
+        .task {
+            if !game.fastGame, let board = game.board {
+                await fetchBoardPreview(board: board)
+            }
         }
     }
 
@@ -231,51 +238,58 @@ struct BoardView: View {
 
     @ViewBuilder
     private var suggestionBanner: some View {
-        #if canImport(FoundationModels)
-        if #available(iOS 26, *) {
-            if !game.fastGame && game.phase == .playing
-                && !game.choosingCorner && !game.choosingSecondCorner
-                && (isLoadingSuggestion || suggestionReason != nil) {
-                HStack(spacing: 8) {
-                    Image(systemName: "sparkles")
-                        .foregroundStyle(.purple)
-                        .font(.subheadline)
-
-                    if isLoadingSuggestion {
-                        ProgressView()
-                            .controlSize(.small)
-                        Text("Thinking...")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    } else if let text = suggestionReason {
-                        Text(text)
-                            .font(.subheadline)
-                            .foregroundStyle(.primary)
-                            .lineLimit(3)
-                    }
-
-                    Spacer(minLength: 0)
-                }
-                .padding(8)
-                .background(.purple.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-                .transition(.opacity.combined(with: .move(edge: .top)))
-                .animation(.easeInOut(duration: 0.3), value: suggestionReason)
-                .animation(.easeInOut(duration: 0.3), value: isLoadingSuggestion)
+        if !game.fastGame && game.phase == .playing {
+            if game.choosingCorner, (isLoadingPreview || boardPreview != nil) {
+                // Board preview during corner selection
+                aiBanner(
+                    icon: "eye",
+                    loading: isLoadingPreview,
+                    loadingText: "Analyzing board...",
+                    text: boardPreview
+                )
+            } else if !game.choosingCorner && !game.choosingSecondCorner
+                        && (isLoadingSuggestion || suggestionReason != nil) {
+                // Move suggestion during gameplay
+                aiBanner(
+                    icon: "sparkles",
+                    loading: isLoadingSuggestion,
+                    loadingText: "Thinking...",
+                    text: suggestionReason
+                )
             }
         }
-        #endif
+    }
+
+    private func aiBanner(icon: String, loading: Bool, loadingText: String, text: String?) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(.purple)
+                .font(.subheadline)
+
+            if loading {
+                ProgressView()
+                    .controlSize(.small)
+                Text(loadingText)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else if let text {
+                Text(text)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+                    .lineLimit(3)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(8)
+        .background(.purple.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+        .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     private func fetchSuggestion() {
-        #if canImport(FoundationModels)
-        guard #available(iOS 26, *) else { return }
-
-        // Only fetch when Fast Game is off
+        // Only suggest when Fast Game is off
         guard !game.fastGame else {
-            suggestedPosition = nil
-            suggestionReason = nil
-            suggestedPath = []
-            isLoadingSuggestion = false
+            clearSuggestion()
             return
         }
 
@@ -284,64 +298,91 @@ struct BoardView: View {
               game.phase == .playing,
               !game.choosingCorner,
               !game.choosingSecondCorner else {
-            suggestedPosition = nil
-            suggestionReason = nil
-            suggestedPath = []
-            isLoadingSuggestion = false
+            clearSuggestion()
             return
         }
 
-        guard MoveAdvisor.isAvailable else { return }
+        // BFS optimal path from current position to goal
+        let pathCells = board.shortestPath(from: position, to: board.endPosition)
+        guard let firstStep = pathCells.first else {
+            clearSuggestion()
+            return
+        }
 
+        // Verify first step is actually available to the player
         let available = game.availableCells()
-        guard !available.isEmpty else {
-            suggestedPosition = nil
-            suggestionReason = nil
-            suggestedPath = []
-            isLoadingSuggestion = false
+        guard available.contains(firstStep) else {
+            clearSuggestion()
             return
         }
 
-        // Cancel any in-flight suggestion
+        // Cancel any in-flight AI explanation
         suggestionTask?.cancel()
-        isLoadingSuggestion = true
+
+        // Set path and position immediately (BFS is instant)
+        suggestedPosition = firstStep
+        suggestedPath = Set(pathCells)
+
+        // Deterministic fallback reason
+        let cell = board[firstStep]
+        let fallbackReason = "\(cell.challenge.topicId) (\(cell.challenge.difficulty.rawValue)) — \(pathCells.count) steps to goal"
+
+        // AI-enhanced reason (devices with Apple Intelligence)
+        if MoveAdvisor.isAvailable {
+            isLoadingSuggestion = true
+            suggestionReason = nil
+            let advisor = MoveAdvisor()
+            let lives = game.livesRemaining
+            suggestionTask = Task {
+                let reason = await advisor.explainMove(
+                    board: board,
+                    currentPosition: position,
+                    suggestedPosition: firstStep,
+                    livesRemaining: lives
+                )
+                guard !Task.isCancelled else { return }
+                suggestionReason = reason ?? fallbackReason
+                isLoadingSuggestion = false
+            }
+        } else {
+            // No Apple Intelligence — use deterministic reason
+            suggestionReason = fallbackReason
+            isLoadingSuggestion = false
+        }
+    }
+
+    private func clearSuggestion() {
         suggestedPosition = nil
         suggestionReason = nil
         suggestedPath = []
+        isLoadingSuggestion = false
+    }
 
-        let advisor = MoveAdvisor()
-        let variant = game.variant
-        let lives = game.livesRemaining
-        let moves = game.moveCount
-        let wrong = game.wrongCount
-        let score = game.score
-        let leg = game.leg
-        let mode = game.mode
+    // MARK: - Board Preview
 
-        suggestionTask = Task {
-            let result = await advisor.suggest(
-                board: board,
-                currentPosition: position,
-                availableCells: available,
-                variant: variant,
-                livesRemaining: lives,
-                moveCount: moves,
-                wrongCount: wrong,
-                score: score,
-                leg: leg,
-                mode: mode
-            )
-            guard !Task.isCancelled else { return }
-            suggestedPosition = result?.position
-            suggestionReason = result?.reason
-            if let suggested = result?.position {
-                let pathCells = board.shortestPath(from: suggested, to: board.endPosition)
-                suggestedPath = Set(pathCells)
-            } else {
-                suggestedPath = []
+    private func fetchBoardPreview(board: Board) async {
+        isLoadingPreview = true
+
+        var counts: [String: Int] = [:]
+        for r in 0..<board.size {
+            for c in 0..<board.size {
+                counts[board.cells[r][c].topicColor, default: 0] += 1
             }
-            isLoadingSuggestion = false
         }
-        #endif
+        let topicCounts = counts.map { (topic: $0.key, count: $0.value) }
+            .sorted { $0.count > $1.count }
+
+        if QrossAI.isAvailable {
+            boardPreview = await QrossAI.previewBoard(
+                boardSize: board.size,
+                topicCounts: topicCounts
+            )
+        }
+        if boardPreview == nil {
+            // Deterministic fallback
+            let dominant = topicCounts.first?.topic ?? "trivia"
+            boardPreview = "This board is heavy on \(dominant) — pick your corner wisely!"
+        }
+        isLoadingPreview = false
     }
 }

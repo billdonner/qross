@@ -43,7 +43,7 @@ struct QrossAPI {
                 question: item.question,
                 choices: choices,
                 correctIndex: correctIndex,
-                difficulty: .medium,
+                difficulty: Challenge.estimateDifficulty(question: item.question, answers: item.answers),
                 topicId: item.topic,
                 hint: item.hint,
                 explanation: item.explanation

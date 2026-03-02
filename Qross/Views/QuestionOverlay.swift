@@ -15,6 +15,10 @@ struct QuestionOverlay: View {
     @State private var showHintText = false
     @State private var eliminatedIndices: Set<Int> = []
     @State private var reported = false
+    @State private var generatedHint: String?
+    @State private var isGeneratingHint = false
+    @State private var generatedExplanation: String?
+    @State private var isGeneratingExplanation = false
 
     /// Whether the player's selected answer is correct
     private var isCorrectAnswer: Bool {
@@ -22,9 +26,9 @@ struct QuestionOverlay: View {
         return challenge.choices[idx].isCorrect
     }
 
-    /// Whether a hint-text hint is available (card has hint and not yet shown)
+    /// Whether a hint can be shown (always available — AI generates if no built-in hint)
     private var canShowHint: Bool {
-        challenge.hint != nil && !showHintText && !revealed
+        !showHintText && !revealed && !isGeneratingHint
     }
 
     /// Whether we can eliminate a wrong choice (need 2+ wrong choices remaining)
@@ -66,21 +70,37 @@ struct QuestionOverlay: View {
                     .padding(.bottom, 16)
             }
 
-            // Shown hint text
-            if showHintText, let hint = challenge.hint {
-                HStack(spacing: 6) {
-                    Image(systemName: "lightbulb.fill")
-                        .foregroundStyle(.yellow)
-                    Text(hint)
-                        .italic()
+            // Shown hint text (built-in or AI-generated)
+            if showHintText {
+                if let hint = challenge.hint ?? generatedHint {
+                    HStack(spacing: 6) {
+                        Image(systemName: "lightbulb.fill")
+                            .foregroundStyle(.yellow)
+                        Text(hint)
+                            .italic()
+                    }
+                    .font(.callout)
+                    .padding(10)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.yellow.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.bottom, 16)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                } else if isGeneratingHint {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Generating hint...")
+                            .italic()
+                    }
+                    .font(.callout)
+                    .padding(10)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.yellow.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.bottom, 16)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
-                .font(.callout)
-                .padding(10)
-                .frame(maxWidth: .infinity)
-                .background(Color.yellow.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .padding(.bottom, 16)
-                .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
             // Choices
@@ -92,6 +112,14 @@ struct QuestionOverlay: View {
                             selectedIndex = index
                             revealed = true
                             let correct = challenge.choices[index].isCorrect
+                            // Generate explanation if missing (non-fast mode)
+                            if challenge.explanation == nil && !fastGame {
+                                isGeneratingExplanation = true
+                                Task {
+                                    generatedExplanation = await QrossAI.generateExplanation(for: challenge)
+                                    isGeneratingExplanation = false
+                                }
+                            }
                             if fastGame {
                                 // Fast Game ON: auto-dismiss quickly
                                 let delay = correct ? 0.8 : 2.0
@@ -144,13 +172,25 @@ struct QuestionOverlay: View {
             }
             .animation(.spring(duration: 0.3), value: eliminatedIndices)
 
-            // Explanation (after reveal)
-            if revealed, let explanation = challenge.explanation {
-                Text(explanation)
+            // Explanation (after reveal — built-in or AI-generated)
+            if revealed {
+                if let explanation = challenge.explanation ?? generatedExplanation {
+                    Text(explanation)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 16)
+                        .transition(.opacity)
+                } else if isGeneratingExplanation {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Generating explanation...")
+                    }
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding(.top, 16)
                     .transition(.opacity)
+                }
             }
 
             // Report question (after reveal)
@@ -191,10 +231,17 @@ struct QuestionOverlay: View {
 
     private var hintButtons: some View {
         HStack(spacing: 12) {
-            // Show Hint button — always visible, disabled when no hint
+            // Show Hint button — AI generates if no built-in hint
             Button {
                 showHintText = true
                 onHintUsed(1)
+                if challenge.hint == nil {
+                    isGeneratingHint = true
+                    Task {
+                        generatedHint = await QrossAI.generateHint(for: challenge)
+                        isGeneratingHint = false
+                    }
+                }
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "lightbulb.fill")

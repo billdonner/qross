@@ -9,6 +9,9 @@ struct GamePlayView: View {
         return Dictionary(uniqueKeysWithValues: colored.map { ($0.id, $0.color) })
     }
 
+    @State private var postGameAnalysis: String?
+    @State private var isAnalyzing = false
+
     private var gameOver: Bool {
         game.phase == .won || game.phase == .lostWrong || game.phase == .lostStuck
     }
@@ -37,6 +40,11 @@ struct GamePlayView: View {
             }
         }
         .animation(.spring(duration: 0.4), value: gameOver)
+        .onChange(of: game.phase) { _, newPhase in
+            if newPhase == .won || newPhase == .lostWrong || newPhase == .lostStuck {
+                fetchAnalysis()
+            }
+        }
     }
 
     private var resultOverlay: some View {
@@ -104,6 +112,25 @@ struct GamePlayView: View {
                 }
             }
 
+            // AI Analysis
+            if let analysis = postGameAnalysis {
+                Text(analysis)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .transition(.opacity)
+            } else if isAnalyzing {
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("Analyzing...")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .transition(.opacity)
+            }
+
             // Actions
             HStack(spacing: 12) {
                 if won {
@@ -147,6 +174,70 @@ struct GamePlayView: View {
             Text(label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - Post-Game Analysis
+
+    private func fetchAnalysis() {
+        guard !isAnalyzing, !game.fastGame else { return }
+        isAnalyzing = true
+        let won = game.phase == .won
+        let boardSize = game.board?.size ?? game.boardSize
+        let moves = game.moveCount
+        let wrong = game.wrongCount
+        let topicResults = computeTopicResults()
+
+        Task {
+            if QrossAI.isAvailable {
+                postGameAnalysis = await QrossAI.analyzeGame(
+                    won: won,
+                    boardSize: boardSize,
+                    moveCount: moves,
+                    wrongCount: wrong,
+                    topicResults: topicResults
+                )
+            }
+            if postGameAnalysis == nil {
+                postGameAnalysis = deterministicAnalysis(topicResults: topicResults, won: won)
+            }
+            isAnalyzing = false
+        }
+    }
+
+    private func computeTopicResults() -> [(topic: String, correct: Int, wrong: Int)] {
+        guard let board = game.board else { return [] }
+        var results: [String: (correct: Int, wrong: Int)] = [:]
+        for r in 0..<board.size {
+            for c in 0..<board.size {
+                let cell = board.cells[r][c]
+                let topic = cell.topicColor
+                var entry = results[topic, default: (correct: 0, wrong: 0)]
+                switch cell.state {
+                case .correct: entry.correct += 1
+                case .wrong: entry.wrong += 1
+                default: break
+                }
+                results[topic] = entry
+            }
+        }
+        return results.map { (topic: $0.key, correct: $0.value.correct, wrong: $0.value.wrong) }
+            .sorted { $0.wrong > $1.wrong }
+    }
+
+    private func deterministicAnalysis(topicResults: [(topic: String, correct: Int, wrong: Int)], won: Bool) -> String {
+        let worst = topicResults.first(where: { $0.wrong > 0 })
+        let best = topicResults.max(by: { $0.correct < $1.correct })
+        if won {
+            if let b = best, b.correct > 0 {
+                return "Strong in \(b.topic)!" + (worst.map { " Work on \($0.topic)." } ?? "")
+            }
+            return "Great game!"
+        } else {
+            if let w = worst {
+                return "\(w.topic) was tough — \(w.wrong) wrong. Try easier topics next time."
+            }
+            return "Better luck next time!"
         }
     }
 }

@@ -3,8 +3,8 @@
 A beautiful standalone iOS trivia game where players navigate a colored grid from corner to corner by answering questions correctly. Each cell holds a trivia question from a topic. Strategy meets knowledge.
 
 ## Stack
-- SwiftUI, iOS 17+ (@Observable, no MVVM — views own state directly)
-- Swift 5.9, Xcode 16+
+- SwiftUI, iOS 26+ (@Observable, no MVVM — views own state directly)
+- Swift 5.9, Xcode 26+
 - No SPM dependencies — pure Apple frameworks
 - Project generated with xcodegen from `project.yml`
 - Bundle ID: `com.qross.app`, Version: 0.2 (build 4)
@@ -61,20 +61,44 @@ Qross uses a simple versioning scheme — no client/server API version negotiati
 - `GameCenterManager` is `@Observable` — drives leaderboard UI based on auth state
 - `TopicPalette.assign()` dynamically assigns colors at game start — colors are not persisted or sent over the wire
 - `Board` is a value type (struct) — immutable after generation, mutated via copy-on-write in GameState
-- `MoveAdvisor` uses Apple FoundationModels (on-device LLM, iOS 26+) — wrapped in `#if canImport(FoundationModels)` + `@available(iOS 26, *)`, zero impact on older iOS
+- `MoveAdvisor` uses Apple FoundationModels (on-device LLM) — runtime `isAvailable` check for devices without Apple Intelligence; falls back to deterministic suggestions
 
-## AI Move Suggestions
+## AI Features
 
-When Fast Game is OFF, the on-device Apple Intelligence model provides strategic move suggestions after each correct answer:
-- **File:** `Qross/Services/MoveAdvisor.swift` — FoundationModels wrapper + prompt builder
-- **Structured output:** `@Generable MoveSuggestion` returns `cellLabel` + `reason`; prompt labels available cells A/B/C with direction, topic, difficulty, and goal assessment — small model picks the best letter
-- **Return type:** `(position: CellPosition, reason: String)?` — maps the chosen label back to a board position
-- **UI:** Purple-tinted banner between header and grid shows the reason; recommended cell gets a purple border overlay in `CellView` (via `isAISuggested` parameter)
-- Fresh `LanguageModelSession` per suggestion (avoids context accumulation)
+All AI features use Apple FoundationModels (on-device LLM). Every feature has a deterministic fallback for devices without Apple Intelligence. All gated by `QrossAI.isAvailable` / `MoveAdvisor.isAvailable` runtime check. Disabled entirely in Fast Game mode.
+
+### Move Suggestions (`MoveAdvisor.swift`)
+- **Pathfinding:** `Board.shortestPath(from:to:)` — BFS on 8-connected grid, instant, always optimal
+- **AI explanation:** `MoveAdvisor.explainMove()` — `@Generable MoveExplanation` generates a reason for the BFS-chosen cell
+- **Fallback:** "Topic (difficulty) — N steps to goal"
+- **UI:** Purple banner + solid purple border on suggested cell + dashed border on path to goal
 - Triggers on `game.currentPosition` change, cancels previous Task on rapid moves
-- Purple highlight clears immediately on any cell tap
-- Silent no-op when: iOS < 26, Apple Intelligence disabled, Fast Game ON, corner-picking, or game over
-- Reads board state (topics, difficulty, distance to goal) but never mutates game state
+
+### Board Preview (`QrossAI.previewBoard`)
+- One-sentence board assessment shown during corner-picking phase
+- Uses eye icon in purple banner: "This board is heavy on Science — expect a challenge!"
+- **Fallback:** "This board is heavy on [dominant topic] — pick your corner wisely!"
+
+### Hint Generation (`QrossAI.generateHint`)
+- When a question has no built-in hint, AI generates one on demand
+- Triggered by "Show Hint" button tap — shows loading spinner, then hint
+- **Fallback:** Button disabled (no hint available)
+
+### Explanation Generation (`QrossAI.generateExplanation`)
+- When a question has no built-in explanation, AI generates one after answer reveal
+- Shows loading spinner below answer choices, then explanation text
+- Only in non-fast mode (answer review screen has 10s timeout)
+- **Fallback:** No explanation shown
+
+### Post-Game Analysis (`QrossAI.analyzeGame`)
+- One-sentence performance analysis shown in result overlay after game ends
+- Computes per-topic correct/wrong counts, feeds to AI
+- **Fallback:** Deterministic analysis: "Strong in [best topic]! Work on [worst topic]."
+
+### Difficulty Estimation (`Challenge.estimateDifficulty`)
+- Heuristic-based (no AI, instant) — runs at question parse time in `APIClient`
+- Factors: question length, answer text length, shared words across answers, negation words
+- Replaces hardcoded `.medium` — difficulty badges now reflect actual question characteristics
 
 ## API Dependency
 
@@ -249,7 +273,8 @@ qross/
 │   │   ├── APIClient.swift        # cardzerver API
 │   │   ├── QuestionCache.swift    # Offline question storage
 │   │   ├── GameCenterManager.swift
-│   │   └── MoveAdvisor.swift      # On-device AI move suggestions (iOS 26+)
+│   │   ├── MoveAdvisor.swift      # BFS pathfinding + AI move explanations
+│   │   └── QrossAI.swift          # AI hints, explanations, analysis, board preview
 │   ├── Assets.xcassets/
 │   └── Info.plist
 ├── QrossClip/               # App Clip target
@@ -294,7 +319,7 @@ swift build -c release  # if CLI tools added later
 - StatsView is a placeholder — game history persistence not yet built
 - Concentration variant enum exists but is hidden from UI picker — gameplay logic for pair-matching not implemented
 - `fetchQuestions(categories:)` filters client-side after fetching all gamedata — no server-side category filtering yet
-- Difficulty is not parsed from the API — all questions are treated as `.medium`
+- Difficulty is estimated by heuristic (`Challenge.estimateDifficulty`) since the API doesn't provide it — accuracy varies
 
 ## Ports
 

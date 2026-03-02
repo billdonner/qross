@@ -1,111 +1,53 @@
-#if canImport(FoundationModels)
 import FoundationModels
 import Foundation
 
-@available(iOS 26, *)
 @Generable
-struct MoveSuggestion {
-    @Guide(description: "The letter label of the recommended cell (A, B, C, etc.)")
-    var cellLabel: String
-    @Guide(description: "One sentence explaining why this is the best move")
+struct MoveExplanation {
+    @Guide(description: "One sentence explaining why this move is strategically good")
     var reason: String
 }
 
-@available(iOS 26, *)
 final class MoveAdvisor {
 
+    /// Runtime check — false on devices without Apple Intelligence
     static var isAvailable: Bool {
         SystemLanguageModel.default.isAvailable
     }
 
-    func suggest(
+    /// Generate a one-sentence explanation for a pre-determined best move (chosen by BFS).
+    func explainMove(
         board: Board,
         currentPosition: CellPosition,
-        availableCells: [CellPosition],
-        variant: GameVariant,
-        livesRemaining: Int,
-        moveCount: Int,
-        wrongCount: Int,
-        score: Int,
-        leg: Int,
-        mode: GameMode
-    ) async -> (position: CellPosition, reason: String)? {
-        guard Self.isAvailable, !availableCells.isEmpty else { return nil }
+        suggestedPosition: CellPosition,
+        livesRemaining: Int
+    ) async -> String? {
+        guard Self.isAvailable else { return nil }
 
-        // Build label-to-position mapping alongside the prompt
-        var labelMap: [String: CellPosition] = [:]
-        let prompt = buildPrompt(
-            board: board,
-            currentPosition: currentPosition,
-            availableCells: availableCells,
-            livesRemaining: livesRemaining,
-            mode: mode,
-            leg: leg,
-            labelMap: &labelMap
-        )
+        let cell = board[suggestedPosition]
+        let topic = cell.challenge.topicId
+        let diff = cell.challenge.difficulty.rawValue
+        let dir = directionLabel(from: currentPosition, to: suggestedPosition)
+        let goalNote = goalAssessment(from: currentPosition, to: suggestedPosition, goal: board.endPosition)
+        let stepsToGoal = board.shortestPath(from: suggestedPosition, to: board.endPosition).count
+
+        let prompt = """
+            \(board.size)×\(board.size) grid trivia game. Goal: \(cornerName(board.endPosition, gridSize: board.size)). \(livesRemaining) lives left.
+            Best move: \(topic) (\(diff)) — \(dir), \(goalNote). \(stepsToGoal) steps to goal after this move.
+            Explain in one sentence why this is a good strategic move.
+            """
 
         let session = LanguageModelSession(
             model: .default,
-            instructions: """
-                You are a concise strategy advisor for Qross, a grid trivia game. \
-                The player navigates from one corner to the opposite by answering \
-                trivia questions. Pick the best available cell and explain why in one sentence. \
-                Consider distance to goal and topic difficulty. Do not use emoji. Be direct.
-                """
+            instructions: "Give concise Qross game strategy advice. No emoji. One sentence max. Be direct."
         )
 
         do {
-            let response = try await session.respond(to: prompt, generating: MoveSuggestion.self)
-            let suggestion = response.content
-            let label = suggestion.cellLabel.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-            guard let position = labelMap[label] else { return nil }
-            let reason = suggestion.reason.trimmingCharacters(in: .whitespacesAndNewlines)
-            return reason.isEmpty ? nil : (position: position, reason: reason)
+            let response = try await session.respond(to: prompt, generating: MoveExplanation.self)
+            let reason = response.content.reason.trimmingCharacters(in: .whitespacesAndNewlines)
+            return reason.isEmpty ? nil : reason
         } catch {
             return nil
         }
-    }
-
-    // MARK: - Prompt Builder
-
-    private func buildPrompt(
-        board: Board,
-        currentPosition: CellPosition,
-        availableCells: [CellPosition],
-        livesRemaining: Int,
-        mode: GameMode,
-        leg: Int,
-        labelMap: inout [String: CellPosition]
-    ) -> String {
-        let goal = board.endPosition
-        let labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-        var lines: [String] = []
-        lines.append("\(board.size)×\(board.size) grid. Goal: \(cornerName(goal, gridSize: board.size)). \(livesRemaining) lives left.")
-        if mode == .doubleCross {
-            lines.append("Mode: Double Cross, Leg \(leg) of 2.")
-        }
-        lines.append("")
-        lines.append("Available moves:")
-
-        for (i, pos) in availableCells.enumerated() {
-            guard i < labels.count else { break }
-            let letter = String(labels[labels.index(labels.startIndex, offsetBy: i)])
-            labelMap[letter] = pos
-
-            let cell = board[pos]
-            let topic = cell.challenge.topicId
-            let diff = cell.challenge.difficulty.rawValue
-            let dir = directionLabel(from: currentPosition, to: pos)
-            let goalNote = goalAssessment(from: currentPosition, to: pos, goal: goal)
-
-            lines.append("\(letter)) \(topic) (\(diff)) — \(dir), \(goalNote)")
-        }
-
-        lines.append("")
-        lines.append("Which cell is the best move? Consider distance to goal and topic difficulty.")
-
-        return lines.joined(separator: "\n")
     }
 
     // MARK: - Helpers
@@ -149,4 +91,3 @@ final class MoveAdvisor {
         }
     }
 }
-#endif
