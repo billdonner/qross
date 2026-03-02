@@ -172,11 +172,11 @@ struct HowToPlayView: View {
                 Text("Max Wrong").font(.caption.bold())
             }
             Divider()
-            GridRow { Text("4\u{00d7}4"); Text("2") }
-            GridRow { Text("5\u{00d7}5"); Text("3") }
-            GridRow { Text("6\u{00d7}6"); Text("4") }
-            GridRow { Text("7\u{00d7}7"); Text("5") }
-            GridRow { Text("8\u{00d7}8"); Text("6") }
+            GridRow { Text("4\u{00d7}4"); Text("4") }
+            GridRow { Text("5\u{00d7}5"); Text("10") }
+            GridRow { Text("6\u{00d7}6"); Text("10") }
+            GridRow { Text("7\u{00d7}7"); Text("10") }
+            GridRow { Text("8\u{00d7}8"); Text("10") }
         }
         .font(.subheadline)
     }

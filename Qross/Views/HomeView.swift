@@ -203,6 +203,11 @@ struct HomeView: View {
                                 .font(.callout)
                         }
                     }
+                    // Version
+                    Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"))")
+                        .font(.caption2)
+                        .foregroundStyle(.quaternary)
+
                     .padding(.bottom, 16)
                     }
                 }

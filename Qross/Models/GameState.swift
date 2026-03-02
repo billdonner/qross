@@ -138,13 +138,14 @@ final class GameState {
                 }
             }
         }
+        // Commit reset so availableCells() sees current state
+        self.board = board
         // Mark reachable untouched cells as available
         for pos in availableCells() {
-            if board[pos].state == .untouched {
-                board[pos].state = .available
+            if self.board![pos].state == .untouched {
+                self.board![pos].state = .available
             }
         }
-        self.board = board
     }
 
     /// Select a corner as the leg 2 target (no question — just a pick)

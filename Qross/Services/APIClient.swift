@@ -10,7 +10,9 @@ struct QrossAPI {
 
     /// Fetch trivia categories with question counts
     static func fetchCategories() async throws -> [Topic] {
-        let url = URL(string: "\(baseURL)/api/v1/trivia/categories?tier=free")!
+        guard let url = URL(string: "\(baseURL)/api/v1/trivia/categories?tier=free") else {
+            throw APIError.badURL
+        }
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw APIError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
@@ -23,7 +25,9 @@ struct QrossAPI {
 
     /// Fetch trivia questions for specific categories
     static func fetchQuestions(categories: [String]? = nil) async throws -> [Challenge] {
-        let url = URL(string: "\(baseURL)/api/v1/trivia/gamedata?tier=free")!
+        guard let url = URL(string: "\(baseURL)/api/v1/trivia/gamedata?tier=free") else {
+            throw APIError.badURL
+        }
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw APIError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
@@ -46,11 +50,11 @@ struct QrossAPI {
                 question: item.question,
                 choices: choices,
                 correctIndex: correctIndex,
-                difficulty: Challenge.Difficulty(rawValue: item.ai_difficulty ?? "")
+                difficulty: Challenge.Difficulty(rawValue: item.ai_difficulty?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "")
                     ?? Challenge.estimateDifficulty(question: item.question, answers: item.answers),
                 topicId: item.topic,
-                hint: item.hint,
-                explanation: item.explanation
+                hint: item.hint?.isEmpty == true ? nil : item.hint,
+                explanation: item.explanation?.isEmpty == true ? nil : item.explanation
             )
         }
     }

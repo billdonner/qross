@@ -368,7 +368,9 @@ struct QuestionOverlay: View {
     }
 
     private func choiceLetter(_ index: Int) -> String {
-        ["A", "B", "C", "D"][index]
+        let letters = "ABCDEFGHIJ"
+        guard index < letters.count else { return "\(index + 1)" }
+        return String(letters[letters.index(letters.startIndex, offsetBy: index)])
     }
 
     private func choiceLetterBG(_ index: Int, choice: Choice) -> Color {
