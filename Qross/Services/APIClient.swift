@@ -25,14 +25,13 @@ struct QrossAPI {
 
     /// Fetch trivia questions for specific categories
     static func fetchQuestions(categories: [String]? = nil) async throws -> [Challenge] {
-        var urlString = "\(baseURL)/api/v1/trivia/gamedata?tier=free"
+        var components = URLComponents(string: "\(baseURL)/api/v1/trivia/gamedata")!
+        var queryItems = [URLQueryItem(name: "tier", value: "free")]
         if let cats = categories, !cats.isEmpty {
-            let joined = cats.joined(separator: ",")
-            if let encoded = joined.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-                urlString += "&categories=\(encoded)"
-            }
+            queryItems.append(URLQueryItem(name: "categories", value: cats.joined(separator: ",")))
         }
-        guard let url = URL(string: urlString) else {
+        components.queryItems = queryItems
+        guard let url = components.url else {
             throw APIError.badURL
         }
         let (data, response) = try await URLSession.shared.data(from: url)
