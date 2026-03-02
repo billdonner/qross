@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AboutView: View {
     @Environment(\.dismiss) private var dismiss
+    @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 36
 
     var body: some View {
         NavigationStack {
@@ -19,7 +20,7 @@ struct AboutView: View {
                     // Title
                     VStack(spacing: 6) {
                         Text("Qross")
-                            .font(.system(size: 36, weight: .black, design: .rounded))
+                            .font(.system(size: titleSize, weight: .black, design: .rounded))
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [.blue, .purple, .pink],

@@ -3,6 +3,8 @@ import SwiftUI
 struct OnboardingView: View {
     let onComplete: () -> Void
     @State private var currentPage = 0
+    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 72
+    @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 28
 
     private let pages: [(icon: String, title: String, subtitle: String, color: Color)] = [
         ("square.grid.3x3.fill",
@@ -58,12 +60,12 @@ struct OnboardingView: View {
                             Spacer()
 
                             Image(systemName: page.icon)
-                                .font(.system(size: 72))
+                                .font(.system(size: iconSize))
                                 .foregroundStyle(page.color)
                                 .symbolRenderingMode(.hierarchical)
 
                             Text(page.title)
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .font(.system(size: titleSize, weight: .bold, design: .rounded))
                                 .multilineTextAlignment(.center)
 
                             Text(page.subtitle)

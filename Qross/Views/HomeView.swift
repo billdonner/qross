@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var showStats = false
     @AppStorage("fastGame") private var fastGame = false
     @AppStorage("enableHaptics") private var enableHaptics = true
+    @AppStorage("textSize") private var textSize = 1
     @Environment(\.scenePhase) private var scenePhase
     @State private var isOffline = false
     @State private var showWelcomeConfetti = false
@@ -134,6 +135,20 @@ struct HomeView: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
+                        }
+
+                        // Text Size picker
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Text Size")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(.secondary)
+                            Picker("Text Size", selection: $textSize) {
+                                Text("Small").tag(0)
+                                Text("Default").tag(1)
+                                Text("Large").tag(2)
+                                Text("XL").tag(3)
+                            }
+                            .pickerStyle(.segmented)
                         }
 
                         // Topic selection
