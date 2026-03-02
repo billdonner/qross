@@ -24,7 +24,7 @@ struct QuestionOverlay: View {
     /// Whether the player's selected answer is correct
     private var isCorrectAnswer: Bool {
         guard let idx = selectedIndex else { return false }
-        return challenge.choices[idx].isCorrect
+        return idx == challenge.correctIndex
     }
 
     /// Whether a hint can be shown (always available — AI generates if no built-in hint)
@@ -36,7 +36,7 @@ struct QuestionOverlay: View {
     private var canEliminate: Bool {
         guard !revealed else { return false }
         let wrongIndices = challenge.choices.indices.filter {
-            !challenge.choices[$0].isCorrect && !eliminatedIndices.contains($0)
+            $0 != challenge.correctIndex && !eliminatedIndices.contains($0)
         }
         return wrongIndices.count >= 2  // keep at least 1 wrong visible
     }
@@ -112,7 +112,7 @@ struct QuestionOverlay: View {
                             guard !revealed else { return }
                             selectedIndex = index
                             revealed = true
-                            let correct = challenge.choices[index].isCorrect
+                            let correct = index == challenge.correctIndex
                             // Generate explanation if missing (non-fast mode)
                             if challenge.explanation == nil && !fastGame {
                                 isGeneratingExplanation = true
@@ -140,7 +140,7 @@ struct QuestionOverlay: View {
                                 Text(choiceLetter(index))
                                     .font(.callout.bold())
                                     .frame(width: 28, height: 28)
-                                    .background(choiceLetterBG(index, choice: choice))
+                                    .background(choiceLetterBG(index))
                                     .foregroundStyle(.white)
                                     .clipShape(Circle())
 
@@ -151,16 +151,17 @@ struct QuestionOverlay: View {
                                 Spacer()
 
                                 if revealed && index == selectedIndex {
-                                    Image(systemName: choice.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                        .foregroundStyle(choice.isCorrect ? .green : .red)
-                                } else if revealed && choice.isCorrect && !isCorrectAnswer {
+                                    let isRight = index == challenge.correctIndex
+                                    Image(systemName: isRight ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                        .foregroundStyle(isRight ? .green : .red)
+                                } else if revealed && index == challenge.correctIndex && !isCorrectAnswer {
                                     // Show checkmark on correct answer when player got it wrong
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundStyle(.green)
                                 }
                             }
                             .padding(12)
-                            .background(choiceBackground(index, choice: choice))
+                            .background(choiceBackground(index))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .disabled(revealed)
@@ -340,7 +341,7 @@ struct QuestionOverlay: View {
 
     private func eliminateOneWrong() {
         let wrongIndices = challenge.choices.indices.filter {
-            !challenge.choices[$0].isCorrect && !eliminatedIndices.contains($0)
+            $0 != challenge.correctIndex && !eliminatedIndices.contains($0)
         }
         if let victim = wrongIndices.randomElement() {
             eliminatedIndices.insert(victim)
@@ -373,19 +374,19 @@ struct QuestionOverlay: View {
         return String(letters[letters.index(letters.startIndex, offsetBy: index)])
     }
 
-    private func choiceLetterBG(_ index: Int, choice: Choice) -> Color {
+    private func choiceLetterBG(_ index: Int) -> Color {
         if revealed && index == selectedIndex {
-            return choice.isCorrect ? .green : .red
+            return index == challenge.correctIndex ? .green : .red
         }
         return topicColor
     }
 
-    private func choiceBackground(_ index: Int, choice: Choice) -> Color {
+    private func choiceBackground(_ index: Int) -> Color {
         if !revealed { return Color(.systemBackground).opacity(0.8) }
         if index == selectedIndex {
-            return choice.isCorrect ? Color.green.opacity(0.15) : Color.red.opacity(0.15)
+            return index == challenge.correctIndex ? Color.green.opacity(0.15) : Color.red.opacity(0.15)
         }
-        if choice.isCorrect {
+        if index == challenge.correctIndex {
             return Color.green.opacity(0.2)
         }
         return Color(.systemBackground).opacity(0.4)

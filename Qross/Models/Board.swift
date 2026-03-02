@@ -152,22 +152,17 @@ struct Board: Codable {
         for q in pool {
             byTopic[q.topicId, default: []].append(q)
         }
-        var topicCycle = topicIds.makeIterator()
+        var topicIndex = 0
         while assigned.count < totalCells {
-            if topicCycle.next() == nil {
-                topicCycle = topicIds.makeIterator()
+            let tid = topicIds[topicIndex % topicIds.count]
+            if var qs = byTopic[tid], !qs.isEmpty {
+                assigned.append(qs.removeFirst())
+                byTopic[tid] = qs
             }
-            // Find next topic with remaining questions
-            var found = false
-            for tid in topicIds {
-                if assigned.count >= totalCells { break }
-                if var qs = byTopic[tid], !qs.isEmpty {
-                    assigned.append(qs.removeFirst())
-                    byTopic[tid] = qs
-                    found = true
-                }
+            topicIndex += 1
+            if topicIndex % topicIds.count == 0 {
+                if !topicIds.contains(where: { byTopic[$0]?.isEmpty == false }) { break }
             }
-            if !found { break }
         }
 
         // Fill remaining with whatever's left if needed

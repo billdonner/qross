@@ -1,9 +1,8 @@
 import Foundation
 
 struct Choice: Codable, Identifiable {
-    var id: String { text }
+    let id: Int
     let text: String
-    let isCorrect: Bool
 }
 
 struct Challenge: Identifiable, Codable {

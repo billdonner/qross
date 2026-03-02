@@ -25,7 +25,14 @@ struct QrossAPI {
 
     /// Fetch trivia questions for specific categories
     static func fetchQuestions(categories: [String]? = nil) async throws -> [Challenge] {
-        guard let url = URL(string: "\(baseURL)/api/v1/trivia/gamedata?tier=free") else {
+        var urlString = "\(baseURL)/api/v1/trivia/gamedata?tier=free"
+        if let cats = categories, !cats.isEmpty {
+            let joined = cats.joined(separator: ",")
+            if let encoded = joined.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+                urlString += "&categories=\(encoded)"
+            }
+        }
+        guard let url = URL(string: urlString) else {
             throw APIError.badURL
         }
         let (data, response) = try await URLSession.shared.data(from: url)
@@ -33,18 +40,14 @@ struct QrossAPI {
             throw APIError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
         }
         let decoded = try JSONDecoder().decode(GameDataResponse.self, from: data)
-        let selectedCats = categories.map(Set.init)
         return decoded.challenges.compactMap { item -> Challenge? in
-            if let cats = selectedCats, !cats.contains(item.topic) { return nil }
             // Skip questions with missing or insufficient answers
             guard item.answers.count >= 2, !item.correct.isEmpty,
                   item.answers.contains(item.correct) else { return nil }
-            // Build choices from answers array + correct string
-            let correctAnswer = item.correct
-            let choices = item.answers.map { ans in
-                Choice(text: ans, isCorrect: ans == correctAnswer)
+            let choices = item.answers.enumerated().map { index, ans in
+                Choice(id: index, text: ans)
             }
-            let correctIndex = item.answers.firstIndex(of: correctAnswer) ?? 0
+            let correctIndex = item.answers.firstIndex(of: item.correct) ?? 0
             return Challenge(
                 id: UUID(uuidString: item.id) ?? UUID(),
                 question: item.question,

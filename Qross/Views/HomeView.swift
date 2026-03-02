@@ -13,6 +13,7 @@ struct HomeView: View {
     @AppStorage("fastGame") private var fastGame = false
     @AppStorage("enableHaptics") private var enableHaptics = true
     @Environment(\.scenePhase) private var scenePhase
+    @State private var isOffline = false
     @State private var showWelcomeConfetti = false
     @State private var backgroundedAt: Date?
 
@@ -161,6 +162,15 @@ struct HomeView: View {
 
                         if isLoading {
                             ProgressView("Loading questions...")
+                        }
+
+                        if isOffline {
+                            HStack(spacing: 6) {
+                                Image(systemName: "wifi.slash")
+                                Text("Offline mode")
+                            }
+                            .font(.caption.bold())
+                            .foregroundStyle(.orange)
                         }
 
                         if let error = errorMessage {
@@ -401,23 +411,43 @@ struct HomeView: View {
     private func startGame() {
         isLoading = true
         errorMessage = nil
+        isOffline = false
         Task {
+            let topicIds = game.selectedTopics.map(\.id)
+            let needed = game.boardSize * game.boardSize
+            var questions: [Challenge] = []
+
             do {
-                let topicIds = game.selectedTopics.map(\.id)
-                let questions = try await QrossAPI.fetchQuestions(categories: topicIds)
-                let needed = game.boardSize * game.boardSize
-                guard questions.count >= needed else {
-                    errorMessage = "Not enough questions. Select more topics."
-                    isLoading = false
-                    return
+                questions = try await QrossAPI.fetchQuestions(categories: topicIds)
+                // Cache per-topic for offline use
+                let byTopic = Dictionary(grouping: questions, by: \.topicId)
+                for (tid, qs) in byTopic {
+                    try? await QuestionCache.shared.save(questions: qs, forTopic: tid)
                 }
-                game.startGame(questions: questions)
-                isLoading = false
-                showGame = true
             } catch {
-                errorMessage = "Failed to load questions: \(error.localizedDescription)"
-                isLoading = false
+                // Try loading from cache
+                if await QuestionCache.shared.hasCached(topicIds: topicIds) {
+                    var cached: [Challenge] = []
+                    for tid in topicIds {
+                        if let qs = await QuestionCache.shared.load(topicId: tid) {
+                            cached.append(contentsOf: qs)
+                        }
+                    }
+                    questions = cached
+                    isOffline = true
+                }
             }
+
+            guard questions.count >= needed else {
+                errorMessage = questions.isEmpty
+                    ? "No connection and no cached questions. Go online first."
+                    : "Not enough questions. Select more topics."
+                isLoading = false
+                return
+            }
+            game.startGame(questions: questions)
+            isLoading = false
+            showGame = true
         }
     }
 }

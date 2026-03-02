@@ -7,7 +7,7 @@ A beautiful standalone iOS trivia game where players navigate a colored grid fro
 - Swift 5.9, Xcode 26+
 - No SPM dependencies — pure Apple frameworks
 - Project generated with xcodegen from `project.yml`
-- Bundle ID: `com.qross.app`, Version: 0.2 (build 14)
+- Bundle ID: `com.qross.app`, Version: 0.2 (build 16)
 
 ## Common Commands
 - `cd ~/qross && xcodegen generate` — regenerate Xcode project from project.yml
@@ -322,7 +322,6 @@ swift build -c release  # if CLI tools added later
 - Daily challenge seed is `nil` (TODO in GameState.swift:65) — date-based seed generation not yet implemented
 - StatsView shows game history from `GameHistory` actor (UserDefaults-backed)
 - Concentration variant enum exists but is hidden from UI picker — gameplay logic for pair-matching not implemented
-- `fetchQuestions(categories:)` filters client-side after fetching all gamedata — no server-side category filtering yet
 - Difficulty uses `ai_difficulty` from API when available (client trims double-quoted values from DB bug); falls back to heuristic `Challenge.estimateDifficulty`
 - Game Center entitlement not yet added — needs provisioning profile with Game Center capability enabled in Apple Developer portal first
 - `xcodegen generate` reverts `Qross/Qross.entitlements` and `QrossClip/QrossClip.entitlements` to empty — must rewrite after running xcodegen if entitlements are needed
