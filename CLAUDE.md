@@ -104,10 +104,20 @@ All AI features use Apple FoundationModels (on-device LLM). Every feature has a 
 
 | Endpoint | Purpose |
 |----------|---------|
-| `GET /api/v1/trivia/gamedata` | Bulk trivia fetch (all categories) |
+| `GET /api/v1/trivia/gamedata` | Bulk trivia fetch (supports `player_id` for dedup, `count` for sampling) |
 | `GET /api/v1/trivia/categories` | Category list with counts |
+| `POST /api/v1/players` | Register/upsert player by device UUID |
+| `POST /api/v1/reports` | Report a question |
 
 Base URL: `https://bd-cardzerver.fly.dev`
+
+### Player Identity
+
+Qross uses anonymous device-based player identity for server-side seen-card tracking:
+- `qross_device_id` — persistent UUID generated on first launch (stored in `@AppStorage`)
+- `qross_player_id` — server-assigned UUID from `POST /api/v1/players` (stored in `@AppStorage`)
+- When `player_id` is passed to `/api/v1/trivia/gamedata`, the server excludes previously served cards
+- Response includes `share_code` (6-char alphanumeric) for session sharing in result screen
 
 ## Targets
 

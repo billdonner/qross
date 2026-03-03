@@ -13,6 +13,8 @@ struct HomeView: View {
     @AppStorage("fastGame") private var fastGame = false
     @AppStorage("enableHaptics") private var enableHaptics = true
     @AppStorage("textSize") private var textSize = 1
+    @AppStorage("qross_device_id") private var deviceId = ""
+    @AppStorage("qross_player_id") private var playerId = ""
     @Environment(\.scenePhase) private var scenePhase
     @State private var isOffline = false
     @State private var showWelcomeConfetti = false
@@ -280,6 +282,7 @@ struct HomeView: View {
             .task {
                 game.fastGame = fastGame
                 gcManager.authenticate()
+                await registerPlayerIfNeeded()
                 await loadTopics()
             }
         }
@@ -423,6 +426,19 @@ struct HomeView: View {
         }
     }
 
+    private func registerPlayerIfNeeded() async {
+        // Generate persistent device ID on first launch
+        if deviceId.isEmpty {
+            deviceId = UUID().uuidString
+        }
+        // Register with server if we don't have a player ID yet
+        if playerId.isEmpty {
+            if let pid = try? await QrossAPI.registerPlayer(deviceId: deviceId) {
+                playerId = pid
+            }
+        }
+    }
+
     private func startGame() {
         isLoading = true
         errorMessage = nil
@@ -433,7 +449,14 @@ struct HomeView: View {
             var questions: [Challenge] = []
 
             do {
-                questions = try await QrossAPI.fetchQuestions(categories: topicIds)
+                let pid = playerId.isEmpty ? nil : playerId
+                let result = try await QrossAPI.fetchQuestions(
+                    categories: topicIds,
+                    playerId: pid
+                )
+                questions = result.challenges
+                game.shareCode = result.shareCode
+                game.freshCount = result.freshCount
                 // Cache per-topic for offline use
                 let byTopic = Dictionary(grouping: questions, by: \.topicId)
                 for (tid, qs) in byTopic {

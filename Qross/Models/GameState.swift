@@ -51,6 +51,8 @@ final class GameState {
     var cornerPair: CornerPair = .topLeftToBottomRight
     var leg: Int = 1
     var choosingSecondCorner: Bool = false
+    var shareCode: String?
+    var freshCount: Int?
 
     var score: Int {
         moveCount + (wrongCount * 2) + hintPenalty
@@ -304,6 +306,8 @@ final class GameState {
         path = []
         leg = 1
         choosingSecondCorner = false
+        shareCode = nil
+        freshCount = nil
     }
 
     // MARK: - Share Card
@@ -324,6 +328,9 @@ final class GameState {
                 }
             }
             text += "\n"
+        }
+        if let shareCode {
+            text += "Challenge: \(shareCode)\n"
         }
         return text
     }

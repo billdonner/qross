@@ -5,6 +5,8 @@ struct ClipContentView: View {
     @Bindable var game: GameState
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @AppStorage("qross_device_id") private var deviceId = ""
+    @AppStorage("qross_player_id") private var playerId = ""
 
     private var topicColors: [String: Color] {
         let colored = TopicPalette.assign(to: game.selectedTopics)
@@ -79,6 +81,15 @@ struct ClipContentView: View {
 
     private func loadAndStart() async {
         isLoading = true
+
+        // Register player for deduplication
+        if deviceId.isEmpty { deviceId = UUID().uuidString }
+        if playerId.isEmpty {
+            if let pid = try? await QrossAPI.registerPlayer(deviceId: deviceId) {
+                playerId = pid
+            }
+        }
+
         do {
             let allTopics = try await QrossAPI.fetchCategories()
             // Pick 3 popular topics for the clip
@@ -90,10 +101,13 @@ struct ClipContentView: View {
             game.cornerPair = .topLeftToBottomRight
             game.variant = .faceDown
 
-            let questions = try await QrossAPI.fetchQuestions(
-                categories: game.selectedTopics.map(\.id)
+            let pid = playerId.isEmpty ? nil : playerId
+            let result = try await QrossAPI.fetchQuestions(
+                categories: game.selectedTopics.map(\.id),
+                playerId: pid
             )
-            game.startGame(questions: questions)
+            game.shareCode = result.shareCode
+            game.startGame(questions: result.challenges)
             isLoading = false
         } catch {
             errorMessage = "Could not load. Check your connection."

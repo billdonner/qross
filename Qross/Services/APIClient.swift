@@ -4,9 +4,42 @@ enum APIError: Error {
     case badURL, networkError(Error), decodingError(Error), serverError(Int)
 }
 
+/// Result from fetching questions — includes session metadata when player_id is provided
+struct FetchResult {
+    let challenges: [Challenge]
+    let shareCode: String?
+    let freshCount: Int?
+    let totalAvailable: Int?
+}
+
 /// Minimal cardzerver API client for fetching trivia questions
 struct QrossAPI {
     static let baseURL = "https://bd-cardzerver.fly.dev"
+
+    // MARK: - Player Identity
+
+    /// Register or upsert a player by device ID. Returns the server-assigned player UUID.
+    static func registerPlayer(deviceId: String, displayName: String? = nil) async throws -> String {
+        guard let url = URL(string: "\(baseURL)/api/v1/players") else {
+            throw APIError.badURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        var body: [String: String] = ["device_id": deviceId]
+        if let displayName { body["display_name"] = displayName }
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw APIError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
+        }
+        let decoded = try JSONDecoder().decode(PlayerResponse.self, from: data)
+        return decoded.id
+    }
+
+    // MARK: - Categories
 
     /// Fetch trivia categories with question counts
     static func fetchCategories() async throws -> [Topic] {
@@ -23,12 +56,23 @@ struct QrossAPI {
         }
     }
 
-    /// Fetch trivia questions for specific categories
-    static func fetchQuestions(categories: [String]? = nil) async throws -> [Challenge] {
+    // MARK: - Questions
+
+    /// Fetch trivia questions, optionally with player-aware deduplication.
+    /// When `playerId` is provided, the server excludes previously seen cards
+    /// and returns session metadata (share code, fresh count).
+    static func fetchQuestions(
+        categories: [String]? = nil,
+        playerId: String? = nil
+    ) async throws -> FetchResult {
         var components = URLComponents(string: "\(baseURL)/api/v1/trivia/gamedata")!
         var queryItems = [URLQueryItem(name: "tier", value: "free")]
         if let cats = categories, !cats.isEmpty {
             queryItems.append(URLQueryItem(name: "categories", value: cats.joined(separator: ",")))
+        }
+        if let pid = playerId {
+            queryItems.append(URLQueryItem(name: "player_id", value: pid))
+            queryItems.append(URLQueryItem(name: "app_id", value: "qross"))
         }
         components.queryItems = queryItems
         guard let url = components.url else {
@@ -39,7 +83,7 @@ struct QrossAPI {
             throw APIError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
         }
         let decoded = try JSONDecoder().decode(GameDataResponse.self, from: data)
-        return decoded.challenges.compactMap { item -> Challenge? in
+        let challenges = decoded.challenges.compactMap { item -> Challenge? in
             // Skip questions with missing or insufficient answers
             guard item.answers.count >= 2, !item.correct.isEmpty,
                   item.answers.contains(item.correct) else { return nil }
@@ -59,7 +103,15 @@ struct QrossAPI {
                 explanation: item.explanation?.isEmpty == true ? nil : item.explanation
             )
         }
+        return FetchResult(
+            challenges: challenges,
+            shareCode: decoded.share_code,
+            freshCount: decoded.fresh_count,
+            totalAvailable: decoded.total_available
+        )
     }
+
+    // MARK: - Reports
 
     /// Report a question — fire-and-forget, errors silently ignored
     static func reportQuestion(
@@ -92,6 +144,10 @@ struct QrossAPI {
 
 // MARK: - API Response Models
 
+private struct PlayerResponse: Decodable {
+    let id: String
+}
+
 private struct CategoriesResponse: Decodable {
     let categories: [CategoryItem]
 
@@ -103,6 +159,10 @@ private struct CategoriesResponse: Decodable {
 
 private struct GameDataResponse: Decodable {
     let challenges: [ChallengeItem]
+    // Session metadata (present when player_id was provided)
+    let share_code: String?
+    let fresh_count: Int?
+    let total_available: Int?
 
     struct ChallengeItem: Decodable {
         let id: String
