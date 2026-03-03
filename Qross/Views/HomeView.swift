@@ -452,7 +452,8 @@ struct HomeView: View {
                 let pid = playerId.isEmpty ? nil : playerId
                 let result = try await QrossAPI.fetchQuestions(
                     categories: topicIds,
-                    playerId: pid
+                    playerId: pid,
+                    count: needed
                 )
                 questions = result.challenges
                 game.shareCode = result.shareCode
@@ -477,9 +478,13 @@ struct HomeView: View {
             }
 
             guard questions.count >= needed else {
-                errorMessage = questions.isEmpty
-                    ? "No connection and no cached questions. Go online first."
-                    : "Not enough questions. Select more topics."
+                if isOffline && questions.isEmpty {
+                    errorMessage = "No connection and no cached questions. Go online first."
+                } else if questions.isEmpty {
+                    errorMessage = "All questions seen! Select more topics or wait for new content."
+                } else {
+                    errorMessage = "Not enough questions (\(questions.count)/\(needed)). Select more topics."
+                }
                 isLoading = false
                 return
             }

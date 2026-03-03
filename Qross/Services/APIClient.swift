@@ -63,16 +63,20 @@ struct QrossAPI {
     /// and returns session metadata (share code, fresh count).
     static func fetchQuestions(
         categories: [String]? = nil,
-        playerId: String? = nil
+        playerId: String? = nil,
+        count: Int? = nil
     ) async throws -> FetchResult {
         var components = URLComponents(string: "\(baseURL)/api/v1/trivia/gamedata")!
         var queryItems = [URLQueryItem(name: "tier", value: "free")]
         if let cats = categories, !cats.isEmpty {
             queryItems.append(URLQueryItem(name: "categories", value: cats.joined(separator: ",")))
         }
-        if let pid = playerId {
+        if let pid = playerId, !pid.isEmpty {
             queryItems.append(URLQueryItem(name: "player_id", value: pid))
             queryItems.append(URLQueryItem(name: "app_id", value: "qross"))
+        }
+        if let c = count {
+            queryItems.append(URLQueryItem(name: "count", value: String(c)))
         }
         components.queryItems = queryItems
         guard let url = components.url else {
