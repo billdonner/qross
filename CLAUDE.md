@@ -7,7 +7,7 @@ A beautiful standalone iOS trivia game where players navigate a colored grid fro
 - Swift 5.9, Xcode 26+
 - No SPM dependencies — pure Apple frameworks
 - Project generated with xcodegen from `project.yml`
-- Bundle ID: `com.qross.app`, Version: 0.2 (build 17)
+- Bundle ID: `com.qross.app`, Version: 0.2 (build 21)
 
 ## Common Commands
 - `cd ~/qross && xcodegen generate` — regenerate Xcode project from project.yml

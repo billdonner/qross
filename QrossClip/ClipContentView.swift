@@ -8,10 +8,7 @@ struct ClipContentView: View {
     @AppStorage("qross_device_id") private var deviceId = ""
     @AppStorage("qross_player_id") private var playerId = ""
 
-    private var topicColors: [String: Color] {
-        let colored = TopicPalette.assign(to: game.selectedTopics)
-        return Dictionary(uniqueKeysWithValues: colored.map { ($0.id, $0.color) })
-    }
+    @State private var topicColors: [String: Color] = [:]
 
     var body: some View {
         ZStack {
@@ -66,13 +63,15 @@ struct ClipContentView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
 
-                Link("Get Qross", destination: URL(string: "https://apps.apple.com/app/qross/id0000000000")!)
-                    .font(.callout.bold())
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .clipShape(Capsule())
+                if let storeURL = URL(string: "https://apps.apple.com/app/qross/id0000000000") {
+                    Link("Get Qross", destination: storeURL)
+                        .font(.callout.bold())
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(.blue)
+                        .foregroundStyle(.white)
+                        .clipShape(Capsule())
+                }
             }
             .padding(.top, 20)
         }
@@ -98,8 +97,9 @@ struct ClipContentView: View {
                 .prefix(3)
             game.selectedTopics = Array(popular)
             game.boardSize = 5
-            game.cornerPair = .topLeftToBottomRight
             game.variant = .faceDown
+            let colored = TopicPalette.assign(to: game.selectedTopics)
+            topicColors = Dictionary(uniqueKeysWithValues: colored.map { ($0.id, $0.color) })
 
             let pid = playerId.isEmpty ? nil : playerId
             let result = try await QrossAPI.fetchQuestions(
@@ -107,6 +107,12 @@ struct ClipContentView: View {
                 playerId: pid
             )
             game.shareCode = result.shareCode
+            let needed = game.boardSize * game.boardSize
+            guard result.challenges.count >= needed else {
+                errorMessage = "Not enough questions available. Try again later."
+                isLoading = false
+                return
+            }
             game.startGame(questions: result.challenges)
             isLoading = false
         } catch {

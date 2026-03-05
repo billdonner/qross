@@ -66,7 +66,9 @@ struct QrossAPI {
         playerId: String? = nil,
         count: Int? = nil
     ) async throws -> FetchResult {
-        var components = URLComponents(string: "\(baseURL)/api/v1/trivia/gamedata")!
+        guard var components = URLComponents(string: "\(baseURL)/api/v1/trivia/gamedata") else {
+            throw APIError.badURL
+        }
         var queryItems = [URLQueryItem(name: "tier", value: "free")]
         if let cats = categories, !cats.isEmpty {
             queryItems.append(URLQueryItem(name: "categories", value: cats.joined(separator: ",")))

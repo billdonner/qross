@@ -20,6 +20,7 @@ struct QuestionOverlay: View {
     @State private var isGeneratingHint = false
     @State private var generatedExplanation: String?
     @State private var isGeneratingExplanation = false
+    @State private var answered = false
 
     /// Whether the player's selected answer is correct
     private var isCorrectAnswer: Bool {
@@ -42,6 +43,7 @@ struct QuestionOverlay: View {
     }
 
     var body: some View {
+        ScrollView {
         VStack(spacing: 0) {
             // Topic badge + difficulty
             HStack {
@@ -125,13 +127,17 @@ struct QuestionOverlay: View {
                                 // Fast Game ON: auto-dismiss quickly
                                 let delay = correct ? 0.8 : 2.0
                                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                                    guard !answered else { return }
+                                    answered = true
                                     onAnswer(index)
                                 }
                             } else {
                                 // Fast Game OFF: show OK button, auto-dismiss after 10s
                                 waitingForContinue = true
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
-                                    guard waitingForContinue else { return }
+                                    guard !answered else { return }
+                                    answered = true
+                                    waitingForContinue = false
                                     onAnswer(index)
                                 }
                             }
@@ -205,6 +211,8 @@ struct QuestionOverlay: View {
             // OK button (Fast Game OFF — dismiss after reviewing answer)
             if waitingForContinue {
                 Button {
+                    guard !answered else { return }
+                    answered = true
                     waitingForContinue = false
                     if let idx = selectedIndex {
                         onAnswer(idx)
@@ -223,6 +231,8 @@ struct QuestionOverlay: View {
             }
         }
         .padding(24)
+        }
+        .scrollBounceBehavior(.basedOnSize)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(radius: 20)

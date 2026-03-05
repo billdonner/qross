@@ -4,11 +4,7 @@ struct GamePlayView: View {
     @Bindable var game: GameState
     let onExit: () -> Void
 
-    private var topicColors: [String: Color] {
-        let colored = TopicPalette.assign(to: game.selectedTopics)
-        return Dictionary(uniqueKeysWithValues: colored.map { ($0.id, $0.color) })
-    }
-
+    @State private var topicColors: [String: Color] = [:]
     @State private var postGameAnalysis: String?
     @State private var isAnalyzing = false
     @State private var showConfetti = false
@@ -29,11 +25,11 @@ struct GamePlayView: View {
 
                 // Result overlay when game ends — compact, pinned to top
                 if gameOver {
-                    VStack {
+                    ScrollView {
                         resultOverlay
                             .padding(.top, 60)
-                        Spacer()
                     }
+                    .scrollBounceBehavior(.basedOnSize)
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
@@ -48,6 +44,10 @@ struct GamePlayView: View {
             }
         }
         .animation(.spring(duration: 0.4), value: gameOver)
+        .onAppear {
+            let colored = TopicPalette.assign(to: game.selectedTopics)
+            topicColors = Dictionary(uniqueKeysWithValues: colored.map { ($0.id, $0.color) })
+        }
         .onChange(of: game.phase) { _, newPhase in
             if newPhase == .won {
                 HapticEngine.win()
