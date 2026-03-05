@@ -12,6 +12,7 @@
 		0BEE5F26CF67FEF9FCE9EA71 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7152E319247A9A0905237356 /* APIClient.swift */; };
 		13323A5270655E23BA5F5153 /* Score.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBFA9B18707C5193434F943 /* Score.swift */; };
 		1493D4DCF0966BBEEE206F52 /* GameStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEDAB92762C99F52FF2CE9F /* GameStateTests.swift */; };
+		2B9F3E68C38AB2C20C421805 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9E7E9E8E4F2C39819C543093 /* PrivacyInfo.xcprivacy */; };
 		2C1AEA10297EE5F45F0613E9 /* QrossAI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA4510E29DB5CB2A2241621 /* QrossAI.swift */; };
 		302006E1AA2BE2399134FCDF /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35ECEF08D4C40C199A3A649E /* CellView.swift */; };
 		3092C5315BE2E1976C953ED2 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B6C066F88F9714C8762E32 /* AboutView.swift */; };
@@ -83,6 +84,7 @@
 		724AB9B07254AE9926727600 /* BoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardTests.swift; sourceTree = "<group>"; };
 		9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterManager.swift; sourceTree = "<group>"; };
 		9C347E629BCF88AAA8325296 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9E7E9E8E4F2C39819C543093 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ABEFDAF3603295ECE9BF2224 /* ClipContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipContentView.swift; sourceTree = "<group>"; };
 		AC911A6463C666B4AE8BCC26 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		ADFF777591C8267BE1EAF4E5 /* HapticEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HapticEngine.swift; path = Qross/Services/HapticEngine.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 			children = (
 				D9553A485CFD8C8247E9D385 /* Assets.xcassets */,
 				1D3298107FE7F0D01A38B0C3 /* Info.plist */,
+				9E7E9E8E4F2C39819C543093 /* PrivacyInfo.xcprivacy */,
 				D1C8C607B984B2ED2346D1B0 /* Qross.entitlements */,
 				C5D72D22DDE71B38FDB2DA66 /* App */,
 				8F874E5B4DC4D764B4C1A4E5 /* Models */,
@@ -358,6 +361,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0A278491433A32134486AAB /* Assets.xcassets in Resources */,
+				2B9F3E68C38AB2C20C421805 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -566,7 +570,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				INFOPLIST_FILE = Qross/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -586,7 +590,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				INFOPLIST_FILE = Qross/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
