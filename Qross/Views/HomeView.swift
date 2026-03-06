@@ -269,6 +269,7 @@ struct HomeView: View {
                     showGame = false
                     game.reset()
                 })
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             }
             .sheet(isPresented: $showHowToPlay) {
                 HowToPlayView()
@@ -357,10 +358,12 @@ struct HomeView: View {
                 Text(label)
                     .font(.caption.bold())
                     .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 Text(description)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)

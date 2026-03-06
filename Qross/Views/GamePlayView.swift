@@ -43,6 +43,7 @@ struct GamePlayView: View {
                 ProgressView()
             }
         }
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .animation(.spring(duration: 0.4), value: gameOver)
         .onAppear {
             let colored = TopicPalette.assign(to: game.selectedTopics)
@@ -74,6 +75,7 @@ struct GamePlayView: View {
                         HStack(spacing: 6) {
                             Text(won ? "You Won!" : "Game Over")
                                 .font(.title3.bold())
+                                .minimumScaleFactor(0.7)
                             if game.mode == .doubleCross {
                                 Text("Double Cross")
                                     .font(.caption.bold())
@@ -89,6 +91,7 @@ struct GamePlayView: View {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(3)
+                                .minimumScaleFactor(0.7)
                         }
                     }
                 }
@@ -240,6 +243,7 @@ struct GamePlayView: View {
                         .foregroundStyle(.secondary)
                         .frame(width: 80, alignment: .trailing)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.6)
 
                     GeometryReader { geo in
                         let total = result.correct + result.wrong

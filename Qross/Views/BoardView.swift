@@ -103,6 +103,7 @@ struct BoardView: View {
                 HStack(spacing: 6) {
                     Text("Qross")
                         .font(.title2.bold())
+                        .minimumScaleFactor(0.7)
                     if game.mode == .doubleCross {
                         Text("Leg \(game.leg) of 2")
                             .font(.subheadline.bold())
@@ -111,6 +112,7 @@ struct BoardView: View {
                             .background(Color.purple.opacity(0.2))
                             .foregroundStyle(.purple)
                             .clipShape(Capsule())
+                            .minimumScaleFactor(0.7)
                     }
                 }
                 if let board = game.board {
@@ -135,9 +137,11 @@ struct BoardView: View {
             VStack(alignment: .trailing) {
                 Text("\(game.moveCount) moves")
                     .font(.headline.monospacedDigit())
+                    .minimumScaleFactor(0.7)
                 Text("Score: \(game.score)")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .minimumScaleFactor(0.7)
             }
         }
     }
@@ -192,6 +196,7 @@ struct BoardView: View {
                 )
             }
         }
+        .dynamicTypeSize(.large)
     }
 
     // MARK: - Lives Bar
@@ -236,6 +241,7 @@ struct BoardView: View {
                             Text(topic)
                                 .font(.caption)
                                 .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                         }
                     }
                 }

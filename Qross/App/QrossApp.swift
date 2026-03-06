@@ -32,6 +32,6 @@ struct RootView: View {
                 }
             }
         }
-        .dynamicTypeSize(dynamicTypeSize)
+        .dynamicTypeSize(...dynamicTypeSize)
     }
 }
