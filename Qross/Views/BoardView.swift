@@ -11,6 +11,7 @@ struct BoardView: View {
     @State private var suggestedPosition: CellPosition?
     @State private var suggestionReason: String?
     @State private var suggestedPath: Set<CellPosition> = []
+    @State private var suggestionRisk: MoveRisk?
     @State private var isLoadingSuggestion = false
     @State private var suggestionTask: Task<Void, Never>?
     @State private var boardPreview: String?
@@ -268,14 +269,15 @@ struct BoardView: View {
                 aiBanner(
                     icon: "sparkles",
                     loading: isLoadingSuggestion,
-                    loadingText: "Thinking...",
-                    text: suggestionReason
+                    loadingText: "Analyzing moves...",
+                    text: suggestionReason,
+                    risk: suggestionRisk
                 )
             }
         }
     }
 
-    private func aiBanner(icon: String, loading: Bool, loadingText: String, text: String?) -> some View {
+    private func aiBanner(icon: String, loading: Bool, loadingText: String, text: String?, risk: MoveRisk? = nil) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .foregroundStyle(.purple)
@@ -295,10 +297,27 @@ struct BoardView: View {
             }
 
             Spacer(minLength: 0)
+
+            if let risk, !loading {
+                Label(risk.rawValue, systemImage: risk.icon)
+                    .font(.caption.bold())
+                    .foregroundStyle(riskColor(risk))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(riskColor(risk).opacity(0.12), in: Capsule())
+            }
         }
         .padding(8)
         .background(.purple.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
         .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    private func riskColor(_ risk: MoveRisk) -> Color {
+        switch risk {
+        case .safe: return .green
+        case .caution: return .orange
+        case .risky: return .red
+        }
     }
 
     private func fetchSuggestion() {
@@ -317,16 +336,19 @@ struct BoardView: View {
             return
         }
 
-        // BFS optimal path from current position to goal
-        let pathCells = board.shortestPath(from: position, to: board.endPosition)
-        guard let firstStep = pathCells.first else {
+        let available = game.availableCells()
+        guard !available.isEmpty else {
             clearSuggestion()
             return
         }
 
-        // Verify first step is actually available to the player
-        let available = game.availableCells()
-        guard available.contains(firstStep) else {
+        // Smart move selection — evaluates all candidates
+        guard let best = MoveAdvisor.bestMove(
+            board: board,
+            currentPosition: position,
+            availableCells: available,
+            livesRemaining: game.livesRemaining
+        ) else {
             clearSuggestion()
             return
         }
@@ -334,13 +356,13 @@ struct BoardView: View {
         // Cancel any in-flight AI explanation
         suggestionTask?.cancel()
 
-        // Set path and position immediately (BFS is instant)
-        suggestedPosition = firstStep
-        suggestedPath = Set(pathCells)
+        // Set path and position immediately (scoring is instant)
+        suggestedPosition = best.position
+        suggestedPath = Set(best.pathToGoal)
+        suggestionRisk = best.risk
 
-        // Deterministic fallback reason
-        let cell = board[firstStep]
-        let fallbackReason = "\(cell.challenge.topicId) (\(cell.challenge.difficulty.rawValue)) — \(pathCells.count) steps to goal"
+        let fallbackReason = MoveAdvisor.fallbackReason(for: best)
+        let alternativeCount = available.count - 1
 
         // AI-enhanced reason (devices with Apple Intelligence)
         if MoveAdvisor.isAvailable {
@@ -352,8 +374,9 @@ struct BoardView: View {
                 let reason = await advisor.explainMove(
                     board: board,
                     currentPosition: position,
-                    suggestedPosition: firstStep,
-                    livesRemaining: lives
+                    move: best,
+                    livesRemaining: lives,
+                    alternativeCount: alternativeCount
                 )
                 guard !Task.isCancelled else { return }
                 suggestionReason = reason ?? fallbackReason
@@ -370,6 +393,7 @@ struct BoardView: View {
         suggestedPosition = nil
         suggestionReason = nil
         suggestedPath = []
+        suggestionRisk = nil
         isLoadingSuggestion = false
     }
 
