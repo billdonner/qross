@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var game: GameState
-    @Binding var availableTopics: [Topic]
     @AppStorage("fastGame") private var fastGame = false
     @AppStorage("enableHaptics") private var enableHaptics = true
     @AppStorage("textSize") private var textSize = 1
@@ -52,12 +51,6 @@ struct SettingsView: View {
                     }
                 }
 
-                if !availableTopics.isEmpty {
-                    Section("Topics") {
-                        topicPicker
-                    }
-                }
-
                 Section("Preferences") {
                     Toggle(isOn: $fastGame) {
                         VStack(alignment: .leading, spacing: 2) {
@@ -102,62 +95,6 @@ struct SettingsView: View {
                     Button("Done") { dismiss() }
                 }
             }
-        }
-    }
-
-    // MARK: - Topic Picker
-
-    private var topicPicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Topics")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("\(game.selectedTopics.count) selected")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(availableTopics) { topic in
-                        let isSelected = game.selectedTopics.contains(topic)
-                        let diffColor = topicDifficultyColor(topic)
-                        Button {
-                            if isSelected {
-                                game.selectedTopics.removeAll { $0.id == topic.id }
-                            } else {
-                                game.selectedTopics.append(topic)
-                            }
-                        } label: {
-                            VStack(spacing: 4) {
-                                Text(topic.name)
-                                    .font(.subheadline.bold())
-                                    .lineLimit(1)
-                                Text("\(topic.questionCount)")
-                                    .font(.caption)
-                            }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(isSelected ? diffColor.opacity(0.2) : diffColor.opacity(0.08))
-                            .foregroundStyle(isSelected ? diffColor : .secondary)
-                            .clipShape(Capsule())
-                            .overlay(
-                                Capsule().stroke(isSelected ? diffColor : Color.clear, lineWidth: 2)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private func topicDifficultyColor(_ topic: Topic) -> Color {
-        switch topic.questionCount {
-        case 400...: return .green
-        case 200..<400: return .orange
-        default: return .red
         }
     }
 

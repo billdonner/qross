@@ -45,7 +45,18 @@ struct HomeView: View {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
-                        .padding(.top, 16)
+                        .padding(.top, 8)
+
+                        // Center icon
+                        Image(systemName: "square.grid.3x3.fill")
+                            .font(.system(size: 48))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.blue.opacity(0.6), .purple.opacity(0.6)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
 
                         // Main actions
                         VStack(spacing: 16) {
@@ -73,6 +84,11 @@ struct HomeView: View {
                             }
                         }
 
+                        // Topic selection
+                        if !availableTopics.isEmpty {
+                            topicPicker
+                        }
+
                         // Play button
                         Button {
                             startGame()
@@ -85,12 +101,20 @@ struct HomeView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                             .background(
-                                LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
+                                game.selectedTopics.count >= 2
+                                    ? LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
+                                    : LinearGradient(colors: [.gray, .gray], startPoint: .leading, endPoint: .trailing)
                             )
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                         }
-                        .disabled(game.selectedTopics.isEmpty || isLoading)
+                        .disabled(game.selectedTopics.count < 2 || isLoading)
+
+                        if game.selectedTopics.count < 2 && !availableTopics.isEmpty {
+                            Text("Select at least 2 topics to play")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                        }
 
                         if isLoading {
                             ProgressView("Loading questions...")
@@ -196,7 +220,7 @@ struct HomeView: View {
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             }
             .sheet(isPresented: $showSettings) {
-                SettingsView(game: game, availableTopics: $availableTopics)
+                SettingsView(game: game)
             }
             .sheet(isPresented: $showHowToPlay) {
                 HowToPlayView()
@@ -213,6 +237,62 @@ struct HomeView: View {
                 await registerPlayerIfNeeded()
                 await loadTopics()
             }
+        }
+    }
+
+    // MARK: - Topic Picker
+
+    private var topicPicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Topics")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("\(game.selectedTopics.count) selected")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(availableTopics) { topic in
+                        let isSelected = game.selectedTopics.contains(topic)
+                        let diffColor = topicDifficultyColor(topic)
+                        Button {
+                            if isSelected {
+                                game.selectedTopics.removeAll { $0.id == topic.id }
+                            } else {
+                                game.selectedTopics.append(topic)
+                            }
+                        } label: {
+                            VStack(spacing: 4) {
+                                Text(topic.name)
+                                    .font(.subheadline.bold())
+                                    .lineLimit(1)
+                                Text("\(topic.questionCount)")
+                                    .font(.caption)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(isSelected ? diffColor.opacity(0.2) : diffColor.opacity(0.08))
+                            .foregroundStyle(isSelected ? diffColor : .secondary)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule().stroke(isSelected ? diffColor : Color.clear, lineWidth: 2)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func topicDifficultyColor(_ topic: Topic) -> Color {
+        switch topic.questionCount {
+        case 400...: return .green
+        case 200..<400: return .orange
+        default: return .red
         }
     }
 
