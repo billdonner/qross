@@ -8,11 +8,11 @@ Qross is a grid-based trivia game where you navigate from one corner of a colorf
 
 ## 2. Starting a Game
 
-From the home screen, configure your game:
+From the home screen:
 
-1. **Board Size** — Tap a size from the segmented picker (4×4 through 8×8). Larger boards are harder but offer more routing options.
-2. **Variant** — Choose Face Up, Face Down, or Blind (see [Variants](#9-variants) below).
-3. **Topics** — Scroll the topic pills and tap to select/deselect. At least 1 topic is required. The app auto-selects 3 popular topics to get you started.
+1. **Quick Start** — Tap a preset (Quick Play, Challenge, or Expert) to set board size, variant, and mode in one tap.
+2. **Topics** — Scroll the topic pills and tap to select/deselect. **At least 2 topics are required.** The app auto-selects popular topics to get you started.
+3. **Settings** — Tap the **gear icon** (top-right) to open Settings, where you can adjust board size, variant, mode, Fast Game, haptics, and text size.
 4. **Play** — Tap the Play button to generate your board and begin.
 
 ## 3. The Grid
@@ -96,7 +96,27 @@ During any question, two hint buttons may appear:
 
 Hints are optional — use them strategically when stuck on a critical path cell.
 
-## 9. Variants
+## 9. AI Move Advisor
+
+During gameplay, a purple banner at the top of the board suggests your best next move. The advisor evaluates every available cell — not just the shortest path — and considers:
+
+- **Path to goal** — how many steps remain
+- **Topic difficulty** — prefers easier topics when lives are low
+- **Escape routes** — avoids dead ends and bottlenecks
+
+A **risk badge** appears on the right side of the banner:
+
+| Badge | Meaning |
+|-------|---------|
+| **Safe** (green shield) | Easy/medium topic, plenty of exits |
+| **Caution** (orange triangle) | Hard topic or narrow corridor |
+| **Risky** (red flame) | Hard topic + low lives, or dead-end ahead |
+
+On devices with Apple Intelligence, the advisor explains *why* the move is best. Otherwise, a quick summary is shown (topic, difficulty, steps to goal).
+
+Turn on **Fast Game** in Settings to disable all AI suggestions for a faster experience.
+
+## 10. Variants
 
 | Variant | What You See | Strategy |
 |---------|-------------|----------|
@@ -104,7 +124,7 @@ Hints are optional — use them strategically when stuck on a critical path cell
 | **Face Down** | Topic colors only, questions hidden | Route by topic color (your strengths), but questions are a surprise |
 | **Blind** | No colors, no questions | Full fog of war — pure luck and adjacency awareness |
 
-## 10. Board Size Reference
+## 11. Board Size Reference
 
 | Size | Total Cells | Min Path | Max Wrong | Difficulty |
 |------|-------------|----------|-----------|------------|
@@ -114,7 +134,7 @@ Hints are optional — use them strategically when stuck on a critical path cell
 | 7×7 | 49 | 7 | 5 | Hard |
 | 8×8 | 64 | 8 | 6 | Expert |
 
-## 11. Sharing Results
+## 12. Sharing Results
 
 After winning, tap **Share** to copy an emoji grid showing your path:
 
@@ -131,7 +151,7 @@ Qross 5×5 ↘ — 6 moves, 1 miss ✅
 - 🟥 = wrong answers (burned cells)
 - ⬜ = untouched cells
 
-## 12. Tips & Strategy
+## 13. Tips & Strategy
 
 1. **Survey before picking a corner.** Look at which topics cluster near each corner and choose one surrounded by your strongest subjects.
 2. **Favor diagonal moves.** Diagonals cover the most ground toward your goal — each diagonal move advances both row and column.

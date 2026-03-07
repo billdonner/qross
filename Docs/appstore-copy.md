@@ -35,6 +35,10 @@ Move to any of the 8 cells surrounding your position — up, down, left, right, 
 
 Choose board sizes from 4x4 (beginner) to 8x8 (expert). Larger boards offer more routing options but require more correct answers. Select from 20+ topic categories — play to your strengths or challenge yourself with unfamiliar subjects.
 
+**AI Move Advisor**
+
+A smart advisor evaluates every available move and suggests the best one. It considers path length, topic difficulty, and escape routes — and warns you with a risk badge (Safe, Caution, or Risky) so you can make informed decisions. On devices with Apple Intelligence, it explains why each move is the best choice.
+
 **Hints When You Need Them**
 
 Stuck on a critical-path question? Use Show Hint to reveal a clue (+1 score penalty) or Eliminate to remove a wrong answer (+2 penalty). Use them strategically — the penalty adds to your final score.
@@ -50,6 +54,7 @@ Compete with friends and the world. Lower scores are better — can you find the
 **What's inside**
 - Square grids from 4x4 to 8x8
 - 20+ trivia categories with 9,000+ questions
+- AI move advisor with risk ratings (Safe, Caution, Risky)
 - Three game variants: Face Up, Face Down, Blind
 - 8-directional movement with strategic path planning
 - Two hint types with score penalties
@@ -60,7 +65,7 @@ Compete with friends and the world. Lower scores are better — can you find the
 - No ads, no subscriptions, no tracking
 
 ## Keywords (100 chars max, comma-separated)
-trivia,quiz,grid,strategy,puzzle,brain,knowledge,categories,path,board game,questions,challenge
+trivia,quiz,grid,strategy,puzzle,brain,knowledge,categories,path,board game,questions,challenge,AI
 
 ## Primary Category
 Games

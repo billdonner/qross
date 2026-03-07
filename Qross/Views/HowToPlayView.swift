@@ -49,6 +49,35 @@ struct HowToPlayView: View {
                         ratingTable
                     }
 
+                    section("AI Move Advisor") {
+                        Text("During gameplay, a purple banner suggests the best next move. The advisor evaluates **every** available cell — not just the shortest path.")
+                        bulletList([
+                            "Avoids dead ends and bottlenecks",
+                            "Prefers easier topics when lives are low",
+                            "Shows a risk badge: Safe, Caution, or Risky",
+                        ])
+                        HStack(spacing: 12) {
+                            riskBadge("checkmark.shield", "Safe", .green)
+                            riskBadge("exclamationmark.triangle", "Caution", .orange)
+                            riskBadge("flame", "Risky", .red)
+                        }
+                        Text("On devices with Apple Intelligence, the advisor explains **why** the move is best. Otherwise, a quick summary is shown.")
+                        Text("Turn on **Fast Game** in Settings to disable all AI suggestions.")
+                    }
+
+                    section("Settings") {
+                        Text("Tap the **gear icon** in the top-right corner of the home screen to open Settings.")
+                        bulletList([
+                            "Board Size (4\u{00d7}4 through 8\u{00d7}8)",
+                            "Variant (Face Up, Face Down, Blind)",
+                            "Mode (Single or Double Cross)",
+                            "Fast Game toggle (disables AI suggestions)",
+                            "Haptics toggle",
+                            "Text Size",
+                        ])
+                        Text("Quick Start presets on the home screen override these settings for one tap convenience.")
+                    }
+
                     section("Variants") {
                         variantRow("Face Up", "eye", "All questions visible — plan your route", .blue)
                         variantRow("Face Down", "eye.slash", "Only topic colors shown", .purple)
@@ -63,8 +92,9 @@ struct HowToPlayView: View {
                         bulletList([
                             "Survey the board before picking a corner",
                             "Favor diagonal moves — they cover the most ground",
-                            "Avoid dead ends — check a cell has onward neighbors",
+                            "Watch the risk badge — Risky moves may cost you a life",
                             "A +1 hint is cheaper than burning a critical cell",
+                            "Select at least 2 topics — more topics means more variety",
                             "Start with 4\u{00d7}4 boards to learn the mechanics",
                         ])
                     }
@@ -120,6 +150,17 @@ struct HowToPlayView: View {
         .padding(14)
         .background(color.opacity(0.08))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func riskBadge(_ icon: String, _ label: String, _ color: Color) -> some View {
+        Label(label, systemImage: icon)
+            .font(.caption.bold())
+            .foregroundStyle(color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background(color.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     private func variantRow(_ name: String, _ icon: String, _ desc: String, _ color: Color) -> some View {

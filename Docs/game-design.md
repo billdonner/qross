@@ -272,6 +272,30 @@ The App Clip is a lightweight version for instant play:
 - Must be under 15MB (App Clip size limit)
 - Shares all game logic code with the main app
 
+## AI Move Advisor
+
+During gameplay, the AI Move Advisor suggests the best next move by evaluating all available cells. It uses a multi-factor scoring system:
+
+### Scoring Factors
+- **Path length to goal** — primary factor, BFS shortest path
+- **Topic difficulty × life pressure** — harder topics penalized more when lives are low
+- **Escape routes** — dead ends (0 exits) and bottlenecks (1 exit) are heavily penalized
+
+### Risk Ratings
+Each suggestion receives a risk badge displayed in the UI:
+
+| Risk | Condition | Badge |
+|------|-----------|-------|
+| Safe | Easy/medium topic, 2+ exits | Green shield |
+| Caution | Hard topic or ≤1 exit | Orange triangle |
+| Risky | Hard topic + low lives, or dead end + low lives | Red flame |
+
+### AI Explanation (Apple Intelligence)
+On devices with Apple Intelligence (FoundationModels), the advisor generates a one-sentence strategic explanation. The prompt includes board state, escape routes, risk level, and alternative count. Falls back to deterministic "Topic (difficulty) — N steps to goal" on other devices.
+
+### Fast Game Mode
+All AI features (move suggestions, board preview, post-game analysis, explanations) are disabled when Fast Game is on. Answer review also auto-dismisses faster (0.8s correct, 2.0s wrong vs. 10s normal).
+
 ## Future Considerations
 
 - **Multiplayer real-time**: Two players race on the same board simultaneously

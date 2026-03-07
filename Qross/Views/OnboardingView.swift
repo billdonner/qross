@@ -19,13 +19,17 @@ struct OnboardingView: View {
          "Answer & Use Hints",
          "Tap cells to answer questions. Use Show Hint (+1) or Eliminate (+2) when you need help.",
          .orange),
+        ("sparkles",
+         "AI Move Advisor",
+         "Get smart move suggestions with risk ratings. The advisor evaluates every option — avoiding dead ends and adapting when lives are low.",
+         .indigo),
         ("star.fill",
          "Score & Compete",
          "Lower scores win. Share your emoji grid and compete on Game Center leaderboards.",
          .green),
         ("play.fill",
          "Ready to Qross?",
-         "Choose your board size, pick your topics, and conquer the grid.",
+         "Pick at least 2 topics, tap Play, and conquer the grid. Tap the gear icon to adjust board size, variant, and more.",
          .pink),
     ]
 

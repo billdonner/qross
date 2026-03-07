@@ -7,7 +7,7 @@ A beautiful standalone iOS trivia game where players navigate a colored grid fro
 - Swift 5.9, Xcode 26+
 - No SPM dependencies — pure Apple frameworks
 - Project generated with xcodegen from `project.yml`
-- Bundle ID: `com.qross.app`, Version: 0.2 (build 22)
+- Bundle ID: `com.qross.app`, Version: 0.2 (build 26)
 
 ## Common Commands
 - `cd ~/qross && xcodegen generate` — regenerate Xcode project from project.yml
@@ -38,10 +38,10 @@ Qross uses a simple versioning scheme — no client/server API version negotiati
 
 | Change type | What to bump |
 |-------------|-------------|
-| Any TestFlight build | `CURRENT_PROJECT_VERSION` (+1) in project.yml, both Info.plists, then `xcodegen generate` |
+| Any TestFlight build | `CURRENT_PROJECT_VERSION` (+1) in project.yml, then `xcodegen generate` |
 | App Store release | `MARKETING_VERSION` (semver) + reset build to 1 |
 
-**Keep all three files in sync** — project.yml is the source of truth but Info.plists must match for App Clip consistency.
+**Info.plists use build-setting variables** (`$(MARKETING_VERSION)` and `$(CURRENT_PROJECT_VERSION)`) — only bump in `project.yml`.
 
 ## Architecture
 
@@ -68,10 +68,17 @@ Qross uses a simple versioning scheme — no client/server API version negotiati
 All AI features use Apple FoundationModels (on-device LLM). Every feature has a deterministic fallback for devices without Apple Intelligence. All gated by `QrossAI.isAvailable` / `MoveAdvisor.isAvailable` runtime check. Disabled entirely in Fast Game mode.
 
 ### Move Suggestions (`MoveAdvisor.swift`)
-- **Pathfinding:** `Board.shortestPath(from:to:)` — BFS on 8-connected grid, instant, always optimal
-- **AI explanation:** `MoveAdvisor.explainMove()` — `@Generable MoveExplanation` generates a reason for the BFS-chosen cell
-- **Fallback:** "Topic (difficulty) — N steps to goal"
-- **UI:** Purple banner + solid purple border on suggested cell + dashed border on path to goal
+- **Smart scoring:** `MoveAdvisor.bestMove()` evaluates ALL available moves (not just BFS first step), scoring each on:
+  - Path length to goal (primary)
+  - Topic difficulty weighted by lives remaining (harder topics penalized more when lives are low)
+  - Escape routes after the move (dead-end and bottleneck penalties)
+- **Risk rating:** Each suggestion gets a `MoveRisk` level:
+  - **Safe** (green shield) — easy/medium topic, plenty of exits
+  - **Caution** (orange triangle) — hard topic or narrow corridor
+  - **Risky** (red flame) — hard topic + low lives, or dead-end ahead
+- **AI explanation:** `MoveAdvisor.explainMove()` — `@Generable MoveExplanation` with enriched prompt (escape routes, risk level, alternative count)
+- **Fallback:** "Topic (difficulty) — N steps to goal" (+ "bottleneck ahead" when exits ≤ 1)
+- **UI:** Purple banner + risk badge capsule + solid purple border on suggested cell + dashed border on path to goal
 - Triggers on `game.currentPosition` change, cancels previous Task on rapid moves
 
 ### Board Preview (`QrossAI.previewBoard`)
@@ -232,17 +239,19 @@ The App Clip (`QrossClip`) provides a single-game experience:
 
 ```
 Launch
-  └─ Onboarding (5-page TabView, first launch only)
-       └─ Home (animated grid background)
-            ├─ Board Size picker (4-8 segmented)
-            ├─ Variant picker (Face Up / Face Down / Blind)
-            ├─ Topic picker (horizontal capsule pills)
+  └─ Onboarding (6-page TabView, first launch only)
+       └─ Home (minimal cover — animated grid background)
+            ├─ Grid icon + logo + tagline
+            ├─ Quick Start presets (Quick Play / Challenge / Expert)
+            ├─ Topic picker (horizontal capsule pills, 2+ required)
             ├─ Play → GamePlayView (full-screen cover)
             │    ├─ Pick corner (all 4 highlighted)
+            │    ├─ AI suggestion banner (risk badge + explanation)
             │    ├─ Answer question → correct/wrong
             │    │    ├─ Hint: Show Hint (+1) / Eliminate (+2)
             │    ├─ Win → confetti + score card + share
             │    └─ Lose → reason + score card + share
+            ├─ ⚙ Settings (sheet — board size, variant, mode, fast game, haptics, text size)
             ├─ How to Play (HowToPlayView, sheet)
             ├─ About (AboutView, sheet)
             └─ Leaderboards (Game Center, if authenticated)
@@ -270,8 +279,9 @@ qross/
 │   │   ├── Challenge.swift        # Question/answer/hint model
 │   │   └── Score.swift            # GameScore struct + ratings
 │   ├── Views/
-│   │   ├── OnboardingView.swift   # 5-page first-launch onboarding
-│   │   ├── HomeView.swift         # Main menu with size/variant/topic pickers
+│   │   ├── OnboardingView.swift   # 6-page first-launch onboarding (includes AI advisor)
+│   │   ├── HomeView.swift         # Minimal cover: presets, topics, play, gear icon
+│   │   ├── SettingsView.swift     # Settings sheet: board size, variant, mode, preferences
 │   │   ├── GamePlayView.swift     # Full-screen game container + result overlay
 │   │   ├── BoardView.swift        # The main game grid
 │   │   ├── CellView.swift         # Individual cell rendering (bounce/shake animations)
@@ -285,7 +295,7 @@ qross/
 │   │   ├── QuestionCache.swift    # Offline question storage
 │   │   ├── GameCenterManager.swift
 │   │   ├── HapticEngine.swift     # Centralized haptic feedback (6 feedback types)
-│   │   ├── MoveAdvisor.swift      # BFS pathfinding + AI move explanations
+│   │   ├── MoveAdvisor.swift      # Smart move scoring + risk rating + AI explanations
 │   │   └── QrossAI.swift          # AI hints, explanations, analysis, board preview
 │   ├── Assets.xcassets/
 │   └── Info.plist
@@ -306,7 +316,7 @@ qross/
 - **Correct**: Green flash + scale bounce (1.15x), success haptic
 - **Wrong**: Red shake (±6pt horizontal), error haptic
 - **Win**: Confetti particle burst (80 particles, Canvas, 3s), double success haptic
-- **Haptics**: Centralized via `HapticEngine` — toggle in HomeView settings (`@AppStorage("enableHaptics")`)
+- **Haptics**: Centralized via `HapticEngine` — toggle in Settings sheet (`@AppStorage("enableHaptics")`)
 - **Available cells**: Gentle pulse animation
 - **Unavailable cells**: Dimmed
 - **Typography**: SF Rounded for a friendly game feel
