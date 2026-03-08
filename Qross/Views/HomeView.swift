@@ -20,6 +20,7 @@ struct HomeView: View {
     @State private var isOffline = false
     @State private var showWelcomeConfetti = false
     @State private var backgroundedAt: Date?
+    @State private var deepLinkError: String?
 
     var body: some View {
         NavigationStack {
@@ -233,6 +234,14 @@ struct HomeView: View {
             .sheet(isPresented: $showStats) {
                 StatsView()
             }
+            .alert("Challenge Error", isPresented: Binding(
+                get: { deepLinkError != nil },
+                set: { if !$0 { deepLinkError = nil } }
+            )) {
+                Button("OK") { deepLinkError = nil }
+            } message: {
+                Text(deepLinkError ?? "")
+            }
             .task {
                 game.fastGame = fastGame
                 gcManager.authenticate()
@@ -257,7 +266,7 @@ struct HomeView: View {
                 }
                 // Small delay to let sheets dismiss
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    acceptChallenge(code: code.uppercased())
+                    acceptChallenge(code: code.uppercased(), fromDeepLink: true)
                 }
             }
         }
@@ -462,7 +471,7 @@ struct HomeView: View {
         }
     }
 
-    private func acceptChallenge(code: String) {
+    private func acceptChallenge(code: String, fromDeepLink: Bool = false) {
         isLoading = true
         errorMessage = nil
         Task {
@@ -471,7 +480,8 @@ struct HomeView: View {
                 let boardSize = result.challengeData?.board_size ?? game.boardSize
                 let needed = boardSize * boardSize
                 guard result.challenges.count >= needed else {
-                    errorMessage = "Not enough questions in this challenge."
+                    let msg = "Not enough questions in this challenge."
+                    if fromDeepLink { deepLinkError = msg } else { errorMessage = msg }
                     isLoading = false
                     return
                 }
@@ -483,23 +493,15 @@ struct HomeView: View {
                 let topicIds = Set(result.challenges.map(\.topicId))
                 game.selectedTopics = availableTopics.filter { topicIds.contains($0.id) }
                 if game.selectedTopics.isEmpty {
-                    // Create placeholder topics if not in our list
                     game.selectedTopics = topicIds.map { Topic(id: $0, name: $0, questionCount: 0) }
                 }
 
                 game.startGame(questions: result.challenges)
-
-                // If corner is locked, force the starting corner
-                if let lockedCorner = result.challengeData?.locked_corner,
-                   lockedCorner.count == 2 {
-                    // The forced corner will be handled in GamePlayView
-                    // by checking challengerData.locked_corner
-                }
-
                 isLoading = false
                 showGame = true
             } catch {
-                errorMessage = "Challenge not found. Check the code."
+                let msg = "Challenge \"\(code)\" not found."
+                if fromDeepLink { deepLinkError = msg } else { errorMessage = msg }
                 isLoading = false
             }
         }

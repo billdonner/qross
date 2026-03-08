@@ -89,6 +89,10 @@ struct BoardView: View {
         .onChange(of: game.currentPosition) {
             fetchSuggestion()
         }
+        .onChange(of: game.wrongCount) {
+            // Re-evaluate after a wrong answer changes available cells
+            fetchSuggestion()
+        }
         .task {
             if !game.fastGame, let board = game.board {
                 await fetchBoardPreview(board: board)
