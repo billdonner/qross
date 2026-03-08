@@ -239,6 +239,27 @@ struct HomeView: View {
                 await registerPlayerIfNeeded()
                 await loadTopics()
             }
+            .onOpenURL { url in
+                // Handle qross://challenge/CODE deep links
+                guard url.scheme == "qross",
+                      url.host == "challenge",
+                      let code = url.pathComponents.last,
+                      code.count == 6 else { return }
+                // Dismiss any open sheets first
+                showSettings = false
+                showHowToPlay = false
+                showAbout = false
+                showStats = false
+                // If already in a game, exit it
+                if showGame {
+                    showGame = false
+                    game.reset()
+                }
+                // Small delay to let sheets dismiss
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    acceptChallenge(code: code.uppercased())
+                }
+            }
         }
     }
 

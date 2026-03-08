@@ -33,6 +33,17 @@
     <array>
         <string>UIInterfaceOrientationPortrait</string>
     </array>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>com.qross.app</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>qross</string>
+            </array>
+        </dict>
+    </array>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
     <key>NSAppTransportSecurity</key>

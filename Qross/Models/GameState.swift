@@ -372,9 +372,9 @@ final class GameState {
             text += "\n"
         }
         if let shareCode {
-            text += "Challenge me: \(shareCode)\n"
+            text += "Challenge me: qross://challenge/\(shareCode)\n"
         }
-        text += Self.appURL + "\n"
+        text += "Get Qross: \(Self.appURL)\n"
         return text
     }
 }
