@@ -352,7 +352,7 @@ final class GameState {
 
     // MARK: - Share Card
 
-    static let appURL = "https://apps.apple.com/app/qross/id6743644498"
+    static let appURL = "https://testflight.apple.com/join/W6VjPWV6"
 
     func shareText() -> String {
         guard let board else { return "" }
