@@ -8,6 +8,7 @@ struct GamePlayView: View {
     @State private var postGameAnalysis: String?
     @State private var isAnalyzing = false
     @State private var showConfetti = false
+    @State private var showResults = true
 
     private var gameOver: Bool {
         game.phase == .won || game.phase == .lostWrong || game.phase == .lostStuck
@@ -24,29 +25,65 @@ struct GamePlayView: View {
                 .ignoresSafeArea()
 
             if game.board != nil {
-                // Board always visible once game starts — dimmed when game over
-                BoardView(game: game, topicColors: topicColors, onQuit: gameOver ? nil : onExit)
-                    .opacity(gameOver ? 0.3 : 1.0)
-                    .allowsHitTesting(!gameOver)
-                    .overlay(alignment: .top) {
-                        if isChallenge && !gameOver {
-                            HStack(spacing: 6) {
-                                Image(systemName: "trophy.fill")
-                                    .font(.caption2)
-                                Text("Challenge Round")
-                                    .font(.caption.bold())
+                // Board always visible — dimmed only when results popup is showing
+                VStack(spacing: 0) {
+                    BoardView(game: game, topicColors: topicColors, onQuit: gameOver ? nil : onExit)
+                        .opacity(gameOver && showResults ? 0.3 : 1.0)
+                        .allowsHitTesting(!gameOver)
+                        .overlay(alignment: .top) {
+                            if isChallenge && !gameOver {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "trophy.fill")
+                                        .font(.caption2)
+                                    Text("Challenge Round")
+                                        .font(.caption.bold())
+                                }
+                                .foregroundStyle(.purple)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(Color.purple.opacity(0.12), in: Capsule())
+                                .padding(.top, 2)
                             }
-                            .foregroundStyle(.purple)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(Color.purple.opacity(0.12), in: Capsule())
-                            .padding(.top, 2)
                         }
+                        .border(isChallenge ? Color.purple.opacity(0.2) : Color.clear, width: isChallenge ? 2 : 0)
+
+                    // Bottom bar when results are dismissed — review board then navigate
+                    if gameOver && !showResults {
+                        HStack(spacing: 16) {
+                            Button {
+                                onExit()
+                            } label: {
+                                Label("Home", systemImage: "house.fill")
+                                    .font(.callout.bold())
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(Capsule())
+                            }
+
+                            Button {
+                                withAnimation {
+                                    showResults = true
+                                }
+                            } label: {
+                                Label("Results", systemImage: "chart.bar.fill")
+                                    .font(.callout.bold())
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(Color.blue)
+                                    .foregroundStyle(.white)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(.ultraThickMaterial)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
-                    .border(isChallenge ? Color.purple.opacity(0.2) : Color.clear, width: isChallenge ? 2 : 0)
+                }
 
                 // Result overlay when game ends — compact, pinned to top
-                if gameOver {
+                if gameOver && showResults {
                     ScrollView {
                         resultOverlay
                             .padding(.top, 60)
@@ -67,6 +104,7 @@ struct GamePlayView: View {
         }
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .animation(.spring(duration: 0.4), value: gameOver)
+        .animation(.spring(duration: 0.3), value: showResults)
         .onAppear {
             let colored = TopicPalette.assign(to: game.selectedTopics)
             topicColors = Dictionary(uniqueKeysWithValues: colored.map { ($0.id, $0.color) })
@@ -167,7 +205,9 @@ struct GamePlayView: View {
                 }
 
                 Button {
-                    onExit()
+                    withAnimation {
+                        showResults = false
+                    }
                 } label: {
                     Text("Done")
                         .font(.callout.bold())
