@@ -220,7 +220,9 @@ struct HomeView: View {
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             }
             .sheet(isPresented: $showSettings) {
-                SettingsView(game: game)
+                SettingsView(game: game, onAcceptChallenge: { code in
+                    acceptChallenge(code: code)
+                })
             }
             .sheet(isPresented: $showHowToPlay) {
                 HowToPlayView()
@@ -400,6 +402,7 @@ struct HomeView: View {
                     count: needed
                 )
                 questions = result.challenges
+                game.sessionId = result.sessionId
                 game.shareCode = result.shareCode
                 game.freshCount = result.freshCount
                 // Cache per-topic for offline use
@@ -435,6 +438,49 @@ struct HomeView: View {
             game.startGame(questions: questions)
             isLoading = false
             showGame = true
+        }
+    }
+
+    private func acceptChallenge(code: String) {
+        isLoading = true
+        errorMessage = nil
+        Task {
+            do {
+                let result = try await QrossAPI.fetchChallenge(shareCode: code)
+                let boardSize = result.challengeData?.board_size ?? game.boardSize
+                let needed = boardSize * boardSize
+                guard result.challenges.count >= needed else {
+                    errorMessage = "Not enough questions in this challenge."
+                    isLoading = false
+                    return
+                }
+                // Configure game from challenge
+                game.boardSize = boardSize
+                game.challengerData = result.challengeData
+                game.shareCode = code
+                // Infer topics from the challenge questions
+                let topicIds = Set(result.challenges.map(\.topicId))
+                game.selectedTopics = availableTopics.filter { topicIds.contains($0.id) }
+                if game.selectedTopics.isEmpty {
+                    // Create placeholder topics if not in our list
+                    game.selectedTopics = topicIds.map { Topic(id: $0, name: $0, questionCount: 0) }
+                }
+
+                game.startGame(questions: result.challenges)
+
+                // If corner is locked, force the starting corner
+                if let lockedCorner = result.challengeData?.locked_corner,
+                   lockedCorner.count == 2 {
+                    // The forced corner will be handled in GamePlayView
+                    // by checking challengerData.locked_corner
+                }
+
+                isLoading = false
+                showGame = true
+            } catch {
+                errorMessage = "Challenge not found. Check the code."
+                isLoading = false
+            }
         }
     }
 }

@@ -2,10 +2,13 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var game: GameState
+    var onAcceptChallenge: ((String) -> Void)?
     @AppStorage("fastGame") private var fastGame = false
     @AppStorage("enableHaptics") private var enableHaptics = true
     @AppStorage("textSize") private var textSize = 1
     @Environment(\.dismiss) private var dismiss
+    @State private var challengeCode = ""
+    @State private var challengeError: String?
 
     var body: some View {
         NavigationStack {
@@ -48,6 +51,60 @@ struct SettingsView: View {
                             }
                         }
                         .pickerStyle(.segmented)
+                    }
+                }
+
+                Section("Challenge") {
+                    Toggle(isOn: $game.challengeMode) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Challenge Mode")
+                                .font(.callout.bold())
+                            Text("Share your board for others to play")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if game.challengeMode {
+                        Toggle(isOn: $game.lockCorner) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Lock Starting Corner")
+                                    .font(.callout.bold())
+                                Text("Opponent must start from the same corner you pick")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Accept Challenge")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.secondary)
+                        HStack {
+                            TextField("Enter 6-char code", text: $challengeCode)
+                                .textInputAutocapitalization(.characters)
+                                .autocorrectionDisabled()
+                                .font(.body.monospaced())
+
+                            Button("Go") {
+                                let code = challengeCode.trimmingCharacters(in: .whitespaces).uppercased()
+                                guard code.count == 6 else {
+                                    challengeError = "Code must be 6 characters"
+                                    return
+                                }
+                                challengeError = nil
+                                dismiss()
+                                onAcceptChallenge?(code)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(challengeCode.trimmingCharacters(in: .whitespaces).count < 6)
+                        }
+                        if let error = challengeError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
                     }
                 }
 

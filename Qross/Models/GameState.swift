@@ -52,7 +52,12 @@ final class GameState {
     var leg: Int = 1
     var choosingSecondCorner: Bool = false
     var shareCode: String?
+    var sessionId: String?
     var freshCount: Int?
+    var challengeMode: Bool = false
+    var lockCorner: Bool = false
+    /// When playing a received challenge, holds the opponent's data
+    var challengerData: ChallengeMetadata?
 
     var score: Int {
         moveCount + (wrongCount * 2) + hintPenalty
@@ -76,7 +81,8 @@ final class GameState {
 
     func startGame(questions: [Challenge]) {
         let coloredTopics = TopicPalette.assign(to: selectedTopics)
-        let seed: UInt64? = nil  // TODO: daily challenge seed
+        // Seed from share code for identical challenge boards
+        let seed: UInt64? = shareCode.map { Self.hashSeed(from: $0) }
         var newBoard = Board.generate(
             size: boardSize,
             cornerPair: cornerPair,
@@ -99,6 +105,26 @@ final class GameState {
         leg = 1
         choosingSecondCorner = false
         phase = .playing
+
+        // Force starting corner if challenge has locked_corner
+        if let locked = challengerData?.locked_corner, locked.count == 2 {
+            let forcedPos = CellPosition(row: locked[0], col: locked[1])
+            forceCorner(at: forcedPos)
+        }
+    }
+
+    /// Force a specific corner as the starting position (for challenge locked_corner)
+    private func forceCorner(at position: CellPosition) {
+        guard var board, phase == .playing, currentPosition == nil else { return }
+        // Mark only this corner as available, reset others
+        for corner in board.corners {
+            if corner == position {
+                board[corner].state = .available
+            } else {
+                board[corner].state = .untouched
+            }
+        }
+        self.board = board
     }
 
     // MARK: - Gameplay
@@ -307,7 +333,21 @@ final class GameState {
         leg = 1
         choosingSecondCorner = false
         shareCode = nil
+        sessionId = nil
         freshCount = nil
+        challengerData = nil
+    }
+
+    // MARK: - Seed Hashing
+
+    /// Convert a share code string to a deterministic UInt64 seed
+    static func hashSeed(from code: String) -> UInt64 {
+        var hash: UInt64 = 0xcbf29ce484222325 // FNV-1a offset basis
+        for byte in code.utf8 {
+            hash ^= UInt64(byte)
+            hash &*= 0x100000001b3 // FNV-1a prime
+        }
+        return hash
     }
 
     // MARK: - Share Card

@@ -54,9 +54,11 @@ struct GamePlayView: View {
                 HapticEngine.win()
                 showConfetti = true
                 fetchAnalysis()
+                saveChallengeIfNeeded()
             } else if newPhase == .lostWrong || newPhase == .lostStuck {
                 HapticEngine.lose()
                 fetchAnalysis()
+                saveChallengeIfNeeded()
             }
         }
     }
@@ -104,6 +106,11 @@ struct GamePlayView: View {
             // Topic performance bars
             if !topicResults.isEmpty {
                 topicPerformanceBars(topicResults: topicResults)
+            }
+
+            // Challenge comparison (when playing a received challenge)
+            if let challenger = game.challengerData?.score {
+                challengeComparison(challenger: challenger, won: won)
             }
 
             // AI Analysis
@@ -315,6 +322,130 @@ struct GamePlayView: View {
         }
         return results.map { (topic: $0.key, correct: $0.value.correct, wrong: $0.value.wrong) }
             .sorted { $0.wrong > $1.wrong }
+    }
+
+    // MARK: - Challenge
+
+    private func saveChallengeIfNeeded() {
+        guard game.challengeMode,
+              let sessionId = game.sessionId,
+              let board = game.board else { return }
+
+        let lockedCorner: [Int]?
+        if game.lockCorner {
+            lockedCorner = [board.startPosition.row, board.startPosition.col]
+        } else {
+            lockedCorner = nil
+        }
+
+        let data = ChallengeData(
+            boardSize: board.size,
+            lockedCorner: lockedCorner,
+            score: ChallengeData.ChallengerScore(
+                moves: game.moveCount,
+                wrong: game.wrongCount,
+                hints: game.hintPenalty,
+                won: game.phase == .won
+            )
+        )
+        QrossAPI.saveChallenge(sessionId: sessionId, data: data)
+    }
+
+    // MARK: - Challenge Comparison
+
+    private func challengeComparison(challenger: ChallengeMetadata.ChallengerScoreResponse, won: Bool) -> some View {
+        let myScore = game.score
+        let theirScore = challenger.moves + (challenger.wrong * 2) + challenger.hints
+        let iWon = game.phase == .won
+        let theyWon = challenger.won
+        let iBeat = iWon && (!theyWon || myScore < theirScore)
+
+        return VStack(spacing: 8) {
+            HStack {
+                Text("Challenge Result")
+                    .font(.subheadline.bold())
+                Spacer()
+                if iBeat {
+                    Text("You win!")
+                        .font(.caption.bold())
+                        .foregroundStyle(.green)
+                } else if iWon == theyWon && myScore == theirScore {
+                    Text("Tied!")
+                        .font(.caption.bold())
+                        .foregroundStyle(.orange)
+                } else {
+                    Text("They win")
+                        .font(.caption.bold())
+                        .foregroundStyle(.red)
+                }
+            }
+
+            HStack(spacing: 12) {
+                // My result
+                VStack(spacing: 4) {
+                    Text("You")
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                    emojiGrid()
+                    HStack(spacing: 4) {
+                        Text(iWon ? "✅" : "❌")
+                            .font(.caption)
+                        Text("\(myScore)")
+                            .font(.callout.bold().monospacedDigit())
+                    }
+                    Text("\(game.moveCount)m \(game.wrongCount)w")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+
+                Divider()
+                    .frame(height: 80)
+
+                // Their result
+                VStack(spacing: 4) {
+                    Text("Challenger")
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                    Text(theyWon ? "✅" : "❌")
+                        .font(.title3)
+                    HStack(spacing: 4) {
+                        Text(theyWon ? "✅" : "❌")
+                            .font(.caption)
+                        Text("\(theirScore)")
+                            .font(.callout.bold().monospacedDigit())
+                    }
+                    Text("\(challenger.moves)m \(challenger.wrong)w")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(12)
+        .background(Color(.secondarySystemBackground).opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    /// Build a small emoji grid showing the player's board result
+    private func emojiGrid() -> some View {
+        guard let board = game.board else { return AnyView(EmptyView()) }
+        let cellSize: CGFloat = max(6, min(12, 80.0 / CGFloat(board.size)))
+        return AnyView(
+            VStack(spacing: 1) {
+                ForEach(0..<board.size, id: \.self) { r in
+                    HStack(spacing: 1) {
+                        ForEach(0..<board.size, id: \.self) { c in
+                            let state = board.cells[r][c].state
+                            Rectangle()
+                                .fill(state == .correct ? Color.green : state == .wrong ? Color.red : Color.gray.opacity(0.3))
+                                .frame(width: cellSize, height: cellSize)
+                        }
+                    }
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 2))
+        )
     }
 
     private func deterministicAnalysis(topicResults: [(topic: String, correct: Int, wrong: Int)], won: Bool) -> String {

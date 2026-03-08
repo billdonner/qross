@@ -26,6 +26,7 @@
 		5C45B963746A173D35FE7A19 /* QrossClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F6465635D9A2BF4FC9C3A9 /* QrossClipApp.swift */; };
 		5E3B94FD4FBF3811AD3667ED /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E73F6D3994088CFADEA3A39A /* Topic.swift */; };
 		6100025305838FA09ED56C3F /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17DC01A303B70BEE63F24C /* Board.swift */; };
+		61160BE5F908D5535ECF8BBC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90812AE16900F0A018EF0A08 /* SettingsView.swift */; };
 		61E373B53BFF9417B517E908 /* HowToPlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F0E09812E59B637EE67BB81 /* HowToPlayView.swift */; };
 		63E4F6EDD64BA9922F137246 /* QuestionCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5CE8DAA2DC875B4ADBC283 /* QuestionCache.swift */; };
 		766463FC4307AFE22E52FAD4 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAA383C294C2DC4F129AFB /* BoardView.swift */; };
@@ -82,6 +83,7 @@
 		68F6465635D9A2BF4FC9C3A9 /* QrossClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrossClipApp.swift; sourceTree = "<group>"; };
 		7152E319247A9A0905237356 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APIClient.swift; path = Qross/Services/APIClient.swift; sourceTree = "<group>"; };
 		724AB9B07254AE9926727600 /* BoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardTests.swift; sourceTree = "<group>"; };
+		90812AE16900F0A018EF0A08 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9A1F43A564D8D574C1F72099 /* GameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterManager.swift; sourceTree = "<group>"; };
 		9C347E629BCF88AAA8325296 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9E7E9E8E4F2C39819C543093 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -232,6 +234,7 @@
 				1F0E09812E59B637EE67BB81 /* HowToPlayView.swift */,
 				AC911A6463C666B4AE8BCC26 /* OnboardingView.swift */,
 				442CA4B722FD1114E6592067 /* QuestionOverlay.swift */,
+				90812AE16900F0A018EF0A08 /* SettingsView.swift */,
 				2F4760C973A278CC064D914C /* StatsView.swift */,
 			);
 			path = Views;
@@ -414,6 +417,7 @@
 				A02D74D5D82B59F1128A8308 /* QuestionCache.swift in Sources */,
 				5463A68725A84BB6A49866ED /* QuestionOverlay.swift in Sources */,
 				13323A5270655E23BA5F5153 /* Score.swift in Sources */,
+				61160BE5F908D5535ECF8BBC /* SettingsView.swift in Sources */,
 				BBD73AA44CABFE7F0AEBB052 /* StatsView.swift in Sources */,
 				99B9C8A938D6D215B7D346CB /* Topic.swift in Sources */,
 			);
@@ -570,7 +574,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 27;
 				INFOPLIST_FILE = Qross/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -590,7 +594,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Qross/Qross.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 27;
 				INFOPLIST_FILE = Qross/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

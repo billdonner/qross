@@ -7,9 +7,24 @@ enum APIError: Error {
 /// Result from fetching questions — includes session metadata when player_id is provided
 struct FetchResult {
     let challenges: [Challenge]
+    let sessionId: String?
     let shareCode: String?
     let freshCount: Int?
     let totalAvailable: Int?
+}
+
+/// Challenge metadata stored on the server after a game
+struct ChallengeData: Codable {
+    let boardSize: Int
+    let lockedCorner: [Int]?  // [row, col] or nil if corner not locked
+    let score: ChallengerScore
+
+    struct ChallengerScore: Codable {
+        let moves: Int
+        let wrong: Int
+        let hints: Int
+        let won: Bool
+    }
 }
 
 /// Minimal cardzerver API client for fetching trivia questions
@@ -111,9 +126,76 @@ struct QrossAPI {
         }
         return FetchResult(
             challenges: challenges,
+            sessionId: decoded.session_id,
             shareCode: decoded.share_code,
             freshCount: decoded.fresh_count,
             totalAvailable: decoded.total_available
+        )
+    }
+
+    // MARK: - Challenge
+
+    /// Save challenge metadata to the server after a game.
+    static func saveChallenge(sessionId: String, data: ChallengeData) {
+        Task {
+            guard let url = URL(string: "\(baseURL)/api/v1/sessions/\(sessionId)") else { return }
+            var request = URLRequest(url: url)
+            request.httpMethod = "PATCH"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            let body: [String: Any] = [
+                "properties": [
+                    "challenge": [
+                        "board_size": data.boardSize,
+                        "locked_corner": data.lockedCorner as Any,
+                        "score": [
+                            "moves": data.score.moves,
+                            "wrong": data.score.wrong,
+                            "hints": data.score.hints,
+                            "won": data.score.won,
+                        ],
+                    ]
+                ]
+            ]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+            _ = try? await URLSession.shared.data(for: request)
+        }
+    }
+
+    /// Fetch a challenge by share code. Returns questions + challenger metadata.
+    static func fetchChallenge(shareCode: String) async throws -> ChallengeResult {
+        guard let url = URL(string: "\(baseURL)/api/v1/sessions/\(shareCode.uppercased())") else {
+            throw APIError.badURL
+        }
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw APIError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
+        }
+        let decoded = try JSONDecoder().decode(ChallengeResponse.self, from: data)
+
+        let challenges = decoded.challenges.compactMap { item -> Challenge? in
+            guard item.answers.count >= 2, !item.correct.isEmpty,
+                  item.answers.contains(item.correct) else { return nil }
+            let choices = item.answers.enumerated().map { index, ans in
+                Choice(id: index, text: ans)
+            }
+            let correctIndex = item.answers.firstIndex(of: item.correct) ?? 0
+            return Challenge(
+                id: UUID(uuidString: item.id) ?? UUID(),
+                question: item.question,
+                choices: choices,
+                correctIndex: correctIndex,
+                difficulty: Challenge.Difficulty(rawValue: item.ai_difficulty?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? "")
+                    ?? Challenge.estimateDifficulty(question: item.question, answers: item.answers),
+                topicId: item.topic,
+                hint: item.hint?.isEmpty == true ? nil : item.hint,
+                explanation: item.explanation?.isEmpty == true ? nil : item.explanation
+            )
+        }
+
+        return ChallengeResult(
+            challenges: challenges,
+            challengeData: decoded.challenge
         )
     }
 
@@ -166,18 +248,43 @@ private struct CategoriesResponse: Decodable {
 private struct GameDataResponse: Decodable {
     let challenges: [ChallengeItem]
     // Session metadata (present when player_id was provided)
+    let session_id: String?
     let share_code: String?
     let fresh_count: Int?
     let total_available: Int?
+}
 
-    struct ChallengeItem: Decodable {
-        let id: String
-        let topic: String
-        let question: String
-        let answers: [String]
-        let correct: String
-        let explanation: String?
-        let hint: String?
-        let ai_difficulty: String?
+/// Result from fetching a challenge by share code
+struct ChallengeResult {
+    let challenges: [Challenge]
+    let challengeData: ChallengeMetadata?
+}
+
+private struct ChallengeResponse: Decodable {
+    let challenges: [ChallengeItem]
+    let challenge: ChallengeMetadata?
+}
+
+struct ChallengeMetadata: Decodable {
+    let board_size: Int?
+    let locked_corner: [Int]?
+    let score: ChallengerScoreResponse?
+
+    struct ChallengerScoreResponse: Decodable {
+        let moves: Int
+        let wrong: Int
+        let hints: Int
+        let won: Bool
     }
+}
+
+private struct ChallengeItem: Decodable {
+    let id: String
+    let topic: String
+    let question: String
+    let answers: [String]
+    let correct: String
+    let explanation: String?
+    let hint: String?
+    let ai_difficulty: String?
 }
