@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Binding var pendingChallengeCode: String?
     @State private var game = GameState()
     @State private var gcManager = GameCenterManager()
     @State private var availableTopics: [Topic] = []
@@ -248,26 +249,12 @@ struct HomeView: View {
                 await registerPlayerIfNeeded()
                 await loadTopics()
             }
-            .onOpenURL { url in
-                // Handle qross://challenge/CODE deep links
-                guard url.scheme == "qross",
-                      url.host == "challenge",
-                      let code = url.pathComponents.last,
-                      code.count == 6 else { return }
-                // Dismiss any open sheets first
-                showSettings = false
-                showHowToPlay = false
-                showAbout = false
-                showStats = false
-                // If already in a game, exit it
-                if showGame {
-                    showGame = false
-                    game.reset()
-                }
-                // Small delay to let sheets dismiss
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    acceptChallenge(code: code.uppercased(), fromDeepLink: true)
-                }
+            .onChange(of: pendingChallengeCode) {
+                handlePendingChallenge()
+            }
+            .onAppear {
+                // Handle deep link from cold launch (onChange won't fire for initial value)
+                handlePendingChallenge()
             }
         }
     }
@@ -468,6 +455,22 @@ struct HomeView: View {
             game.startGame(questions: questions)
             isLoading = false
             showGame = true
+        }
+    }
+
+    private func handlePendingChallenge() {
+        guard let code = pendingChallengeCode else { return }
+        pendingChallengeCode = nil
+        showSettings = false
+        showHowToPlay = false
+        showAbout = false
+        showStats = false
+        if showGame {
+            showGame = false
+            game.reset()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            acceptChallenge(code: code, fromDeepLink: true)
         }
     }
 

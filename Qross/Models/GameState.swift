@@ -353,6 +353,7 @@ final class GameState {
     // MARK: - Share Card
 
     static let appURL = "https://testflight.apple.com/join/W6VjPWV6"
+    static let challengeBaseURL = "https://bd-cardzerver.fly.dev/challenge"
 
     func shareText() -> String {
         guard let board else { return "" }
@@ -372,7 +373,7 @@ final class GameState {
             text += "\n"
         }
         if let shareCode {
-            text += "Challenge me: qross://challenge/\(shareCode)\n"
+            text += "Challenge me: \(Self.challengeBaseURL)/\(shareCode)\n"
         }
         text += "Get Qross: \(Self.appURL)\n"
         return text
