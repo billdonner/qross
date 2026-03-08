@@ -133,6 +133,55 @@ final class QrossAI {
         }
     }
 
+    // MARK: - Challenge Analysis
+
+    static func analyzeChallengeGame(
+        won: Bool,
+        boardSize: Int,
+        moveCount: Int,
+        wrongCount: Int,
+        myScore: Int,
+        challengerWon: Bool,
+        challengerScore: Int,
+        challengerMoves: Int,
+        challengerWrong: Int,
+        topicResults: [(topic: String, correct: Int, wrong: Int)]
+    ) async -> String? {
+        guard isAvailable else { return nil }
+
+        let myOutcome = won ? "Won" : "Lost"
+        let theirOutcome = challengerWon ? "Won" : "Lost"
+        var topicSummary = topicResults
+            .map { "\($0.topic): \($0.correct) correct, \($0.wrong) wrong" }
+            .joined(separator: "\n")
+        if topicSummary.isEmpty { topicSummary = "No detailed data" }
+
+        let prompt = """
+            Qross challenge match on a \(boardSize)×\(boardSize) board.
+
+            Your result: \(myOutcome), score \(myScore) (\(moveCount) moves, \(wrongCount) wrong)
+            Challenger's result: \(theirOutcome), score \(challengerScore) (\(challengerMoves) moves, \(challengerWrong) wrong)
+
+            Your topic performance:
+            \(topicSummary)
+
+            Compare both performances. Who played better and why? What could I improve?
+            """
+
+        let session = LanguageModelSession(
+            model: .default,
+            instructions: "Analyze a head-to-head trivia challenge. Address the player as \"you\". Compare strategies. Two to three sentences. Encouraging but honest. No emoji."
+        )
+
+        do {
+            let response = try await session.respond(to: prompt, generating: AIGameAnalysis.self)
+            let analysis = response.content.analysis.trimmingCharacters(in: .whitespacesAndNewlines)
+            return analysis.isEmpty ? nil : analysis
+        } catch {
+            return nil
+        }
+    }
+
     // MARK: - Board Preview
 
     static func previewBoard(

@@ -352,6 +352,8 @@ final class GameState {
 
     // MARK: - Share Card
 
+    static let appURL = "https://apps.apple.com/app/qross/id6743644498"
+
     func shareText() -> String {
         guard let board else { return "" }
         let status = phase == .won ? "✅" : "❌"
@@ -370,8 +372,9 @@ final class GameState {
             text += "\n"
         }
         if let shareCode {
-            text += "Challenge: \(shareCode)\n"
+            text += "Challenge me: \(shareCode)\n"
         }
+        text += Self.appURL + "\n"
         return text
     }
 }

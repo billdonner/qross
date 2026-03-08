@@ -13,15 +13,37 @@ struct GamePlayView: View {
         game.phase == .won || game.phase == .lostWrong || game.phase == .lostStuck
     }
 
+    private var isChallenge: Bool {
+        game.challengerData != nil
+    }
+
     var body: some View {
         ZStack {
-            Color(.systemBackground).ignoresSafeArea()
+            // Challenge rounds get a distinct purple-tinted background
+            (isChallenge ? Color.purple.opacity(0.06) : Color(.systemBackground))
+                .ignoresSafeArea()
 
             if game.board != nil {
                 // Board always visible once game starts — dimmed when game over
                 BoardView(game: game, topicColors: topicColors, onQuit: gameOver ? nil : onExit)
                     .opacity(gameOver ? 0.3 : 1.0)
                     .allowsHitTesting(!gameOver)
+                    .overlay(alignment: .top) {
+                        if isChallenge && !gameOver {
+                            HStack(spacing: 6) {
+                                Image(systemName: "trophy.fill")
+                                    .font(.caption2)
+                                Text("Challenge Round")
+                                    .font(.caption.bold())
+                            }
+                            .foregroundStyle(.purple)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(Color.purple.opacity(0.12), in: Capsule())
+                            .padding(.top, 2)
+                        }
+                    }
+                    .border(isChallenge ? Color.purple.opacity(0.2) : Color.clear, width: isChallenge ? 2 : 0)
 
                 // Result overlay when game ends — compact, pinned to top
                 if gameOver {
@@ -279,26 +301,53 @@ struct GamePlayView: View {
     // MARK: - Post-Game Analysis
 
     private func fetchAnalysis() {
-        guard !isAnalyzing, !game.fastGame else { return }
+        // Always analyze challenge rounds, even in fast game mode
+        guard !isAnalyzing, (!game.fastGame || isChallenge) else { return }
         isAnalyzing = true
         let won = game.phase == .won
         let boardSize = game.board?.size ?? game.boardSize
         let moves = game.moveCount
         let wrong = game.wrongCount
         let topicResults = computeTopicResults()
+        let challenger = game.challengerData?.score
 
         Task {
             if QrossAI.isAvailable {
-                postGameAnalysis = await QrossAI.analyzeGame(
-                    won: won,
-                    boardSize: boardSize,
-                    moveCount: moves,
-                    wrongCount: wrong,
-                    topicResults: topicResults
-                )
+                if let challenger {
+                    // Challenge-specific AI analysis comparing both performances
+                    let theirScore = challenger.moves + (challenger.wrong * 2) + challenger.hints
+                    postGameAnalysis = await QrossAI.analyzeChallengeGame(
+                        won: won,
+                        boardSize: boardSize,
+                        moveCount: moves,
+                        wrongCount: wrong,
+                        myScore: game.score,
+                        challengerWon: challenger.won,
+                        challengerScore: theirScore,
+                        challengerMoves: challenger.moves,
+                        challengerWrong: challenger.wrong,
+                        topicResults: topicResults
+                    )
+                } else {
+                    postGameAnalysis = await QrossAI.analyzeGame(
+                        won: won,
+                        boardSize: boardSize,
+                        moveCount: moves,
+                        wrongCount: wrong,
+                        topicResults: topicResults
+                    )
+                }
             }
             if postGameAnalysis == nil {
-                postGameAnalysis = deterministicAnalysis(topicResults: topicResults, won: won)
+                if let challenger {
+                    let theirScore = challenger.moves + (challenger.wrong * 2) + challenger.hints
+                    postGameAnalysis = deterministicChallengeAnalysis(
+                        won: won, myScore: game.score,
+                        challengerWon: challenger.won, challengerScore: theirScore
+                    )
+                } else {
+                    postGameAnalysis = deterministicAnalysis(topicResults: topicResults, won: won)
+                }
             }
             isAnalyzing = false
         }
@@ -461,6 +510,24 @@ struct GamePlayView: View {
                 return "\(w.topic) was tough — \(w.wrong) wrong. Try easier topics next time."
             }
             return "Better luck next time!"
+        }
+    }
+
+    private func deterministicChallengeAnalysis(won: Bool, myScore: Int, challengerWon: Bool, challengerScore: Int) -> String {
+        let iBeat = won && (!challengerWon || myScore < challengerScore)
+        let tied = won == challengerWon && myScore == challengerScore
+        if tied {
+            return "A perfect tie! You both scored \(myScore). Share a new challenge to break the deadlock."
+        } else if iBeat {
+            let margin = challengerScore - myScore
+            return "You beat the challenger by \(margin) points! Your efficient path made the difference."
+        } else if won && challengerWon {
+            let margin = myScore - challengerScore
+            return "Close match! The challenger edged you out by \(margin) points. Fewer wrong answers would close the gap."
+        } else if !won && challengerWon {
+            return "The challenger completed the board while you didn't. Focus on reaching the goal corner before running out of lives."
+        } else {
+            return "Neither of you finished — this board was tough! Try a smaller size or easier topics."
         }
     }
 }
